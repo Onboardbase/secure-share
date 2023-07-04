@@ -17,7 +17,7 @@ pub async fn run() -> Result<()> {
     //TODO remove this and make it an argument
     let listen: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 4433);
 
-    let dirs = directories_next::ProjectDirs::from("com", "onboardbase", "share").unwrap();
+    let dirs = directories_next::ProjectDirs::from("com", "onboardbase", "sharebase").unwrap();
     let path = dirs.data_local_dir();
     let certificate_path = path.join("cert.der");
     let key_path = path.join("key.der");
@@ -131,7 +131,7 @@ async fn handle_request(
     // Execute the request
     let resp = "hi there".as_bytes();
     // Write the response
-    send.write_all(&resp)
+    send.write_all(resp)
         .await
         .map_err(|e| anyhow!("failed to send response: {}", e))?;
     // Gracefully terminate the stream

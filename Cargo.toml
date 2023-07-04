@@ -1,13 +1,12 @@
 [package]
 name = "sharebase"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 tokio = { version = "1.28.1", features = ["rt", "rt-multi-thread", "time", "macros", "sync"] }
-clap = { version = "4", features = ["derive"] }
 directories-next = "2"
 anyhow = "1.0.22"
 url = "2"
@@ -16,3 +15,5 @@ rcgen = "0.11.1"
 rustls = "0.21.0"
 quinn = { version = "0.10.1", features = ["tls-rustls"] } 
 tracing-futures = { version = "0.2.5", default-features = false, features = ["std-future"] }
+tracing-subscriber = { version = "0.3.11", default-features = false, features = ["env-filter", "fmt", "ansi", "time", "local-time"] }
+clap = { version = "4.3.10", features = ["derive"] }
