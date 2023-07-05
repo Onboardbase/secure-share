@@ -1,7 +1,9 @@
 use clap::{Parser, Subcommand};
 use std::net::SocketAddr;
 use tracing::metadata::LevelFilter;
+use url::Url;
 
+mod client;
 mod common;
 mod server;
 
@@ -11,6 +13,8 @@ mod server;
 #[command(version = "0.0.1")]
 #[command(about = "Share secrets securely through the terminal", long_about = None)]
 pub struct Cli {
+    ///Host and port URL denoting the receiver
+    url: Option<Url>,
     #[command(subcommand)]
     command: Option<Commands>,
 }
@@ -42,7 +46,13 @@ async fn main() {
     let opt = Cli::parse();
     let code = {
         match opt.command {
-            None => 1,
+            None => match client::run(opt).await {
+                Ok(_) => 0,
+                Err(e) => {
+                    eprintln!("ERROR: {e}");
+                    1
+                }
+            },
             Some(Commands::Receive { listen: _ }) => match server::run().await {
                 Ok(_) => 0,
                 Err(e) => {
