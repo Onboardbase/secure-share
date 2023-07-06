@@ -1,13 +1,14 @@
 use core::ascii;
 use std::{
-    fs, io,
+    fs::{self, File},
+    io::{self, BufWriter, Write},
     net::{IpAddr, Ipv4Addr, SocketAddr},
     str,
     sync::Arc,
 };
 
 //Acts as a receiver
-use crate::common::ALPN_QUIC_HTTP;
+use crate::{common::ALPN_QUIC_HTTP, secret::Secret};
 use anyhow::{anyhow, bail, Context, Result};
 use quinn::{Connecting, ConnectionError, Endpoint, ServerConfig};
 use tracing::{error, info, info_span};
@@ -129,9 +130,13 @@ async fn handle_request(
     info!(content = %escaped);
 
     // Execute the request
-    let resp = "hi there".as_bytes();
+    let resp = process_request(&req).unwrap_or_else(|e| {
+        error!("failed: {}", e);
+        format!("failed to process request: {e}\n").into_bytes()
+    });
+
     // Write the response
-    send.write_all(resp)
+    send.write_all(&resp)
         .await
         .map_err(|e| anyhow!("failed to send response: {}", e))?;
     // Gracefully terminate the stream
@@ -141,4 +146,40 @@ async fn handle_request(
     info!("complete");
 
     Ok(())
+}
+
+fn process_request(x: &[u8]) -> Result<Vec<u8>> {
+    if x.len() < 4 || &x[0..4] != b"GET " {
+        bail!("missing GET");
+    }
+
+    if x[4..].len() < 2 || &x[x.len() - 2..] != b"\r\n" {
+        bail!("missing \\r\\n");
+    }
+    let x = &x[4..x.len() - 2];
+    //The logic here is that since I know that `x.len() - 2` gives me the end of bytes, just before the line break and
+    //return characters(\r\n). That means this position is also the end of the secerts in request body
+    //That being said, the request body is delimited by "\r\n". And the secrets start on a new line right after the
+    //GET and url. Getting the position of the first occurence of "\r\n" and then slicing x up to `x.len() -2" should
+    //give me the secrets.
+
+    let secret_start_position = x.iter().position(|&c| c == b'\n').unwrap_or(x.len());
+    let secrets = &x[secret_start_position + 1..x.len()];
+    let secrets = str::from_utf8(secrets).context("Secrets is malformed UTF-8")?;
+    println!("secrets=={secrets}");
+
+    let secrets_json: Vec<String> =
+        serde_json::from_str(secrets).context("Failed to format secrets to JSON")?;
+    let secrets_json = Secret::secrets_from_string(secrets_json);
+
+    let dirs = directories_next::ProjectDirs::from("com", "onboardbase", "sharebase").unwrap();
+    let path = dirs.data_local_dir();
+    let secret_default_path = path.join("secrets.json");
+    let secrets_file =
+        File::create(secret_default_path).context("Failed to open secrets file storage")?;
+    let mut writer = BufWriter::new(secrets_file);
+    serde_json::to_writer(&mut writer, &secrets_json)?;
+    writer.flush().context("Failed to save secrets")?;
+
+    Ok("SUCCESS".as_bytes().to_vec())
 }

@@ -1,7 +1,9 @@
 use std::{
+    cmp::Ordering,
     fs,
     io::{self, Write},
     net::ToSocketAddrs,
+    process::exit,
     sync::Arc,
     time::{Duration, Instant},
 };
@@ -13,6 +15,8 @@ use super::{common::ALPN_QUIC_HTTP, Cli};
 
 pub async fn run(cli: Cli) -> Result<()> {
     let url = cli.url.ok_or_else(|| anyhow!("URL must be present"))?;
+    let secrets = validate_secrets(cli.secret);
+
     let remote = (url.host_str().unwrap(), url.port().unwrap_or(4433))
         .to_socket_addrs()?
         .next()
@@ -43,13 +47,14 @@ pub async fn run(cli: Cli) -> Result<()> {
     let mut endpoint = quinn::Endpoint::client("[::]:0".parse().unwrap())?;
     endpoint.set_default_client_config(client_config);
 
-    let request = format!("GET {}\r\n", url.path());
+    let request = format!("GET /save_secret\r\n{:?}\r\n", secrets);
     let start = Instant::now();
     let host = url
         .host_str()
         .ok_or_else(|| anyhow!("no hostname specified"))?;
 
     eprintln!("connecting to {host} at {remote}");
+    eprintln!("{request}");
     let conn = endpoint
         .connect(remote, host)?
         .await
@@ -91,4 +96,24 @@ pub async fn run(cli: Cli) -> Result<()> {
 
 fn duration_secs(x: &Duration) -> f32 {
     x.as_secs() as f32 + x.subsec_nanos() as f32 * 1e-9
+}
+
+fn validate_secrets(secrets: Vec<String>) -> Vec<String> {
+    secrets
+        .into_iter()
+        .map(|secret| {
+            let value_key: Vec<&str> = secret.split(',').collect();
+            match value_key.len().cmp(&"2".parse::<usize>().unwrap()) {
+                Ordering::Equal => secret,
+                Ordering::Greater => {
+                    error!("Secret must contain just key and value. {secret} violates that rule");
+                    exit(1);
+                }
+                Ordering::Less => {
+                    error!("Secret cannot be empty. Please check your arguments");
+                    exit(1);
+                }
+            }
+        })
+        .collect::<Vec<_>>()
 }

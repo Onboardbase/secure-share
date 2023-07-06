@@ -5,6 +5,7 @@ use url::Url;
 
 mod client;
 mod common;
+mod secret;
 mod server;
 
 #[derive(Parser)]
@@ -15,6 +16,9 @@ mod server;
 pub struct Cli {
     ///Host and port URL denoting the receiver
     url: Option<Url>,
+    /// Separated list of secrets to share. Key-Value pair is seperated by a comma. "my_key,my_value"
+    #[arg(long, short)]
+    secret: Vec<String>,
     #[command(subcommand)]
     command: Option<Commands>,
 }
