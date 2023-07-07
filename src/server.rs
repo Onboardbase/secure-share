@@ -1,3 +1,4 @@
+///Acts as a receiver
 use core::ascii;
 use std::{
     fs::{self, File},
@@ -7,7 +8,6 @@ use std::{
     sync::Arc,
 };
 
-//Acts as a receiver
 use crate::{common::ALPN_QUIC_HTTP, secret::Secret};
 use anyhow::{anyhow, bail, Context, Result};
 use quinn::{Connecting, ConnectionError, Endpoint, ServerConfig};
