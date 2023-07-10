@@ -99,6 +99,7 @@ jobs:
           path: dist
 
   publish:
+    permissions: write-all
     name: Publish
     needs: [dist]
     runs-on: ubuntu-latest
