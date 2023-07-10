@@ -1,12 +1,10 @@
-use clap::{Parser, Subcommand};
-use std::net::SocketAddr;
-use tracing::metadata::LevelFilter;
-use url::Url;
+use clap::Parser;
+use libp2p::PeerId;
+use std::str::FromStr;
+use tracing::{error, metadata::LevelFilter};
 
-mod client;
-mod common;
-mod secret;
-mod server;
+mod hole_puncher;
+// mod secret;
 
 #[derive(Parser)]
 #[command(name = "Sharebase")]
@@ -14,23 +12,32 @@ mod server;
 #[command(version = "0.0.1")]
 #[command(about = "Share secrets securely through the terminal", long_about = None)]
 pub struct Cli {
-    ///Host and port URL denoting the receiver
-    url: Option<Url>,
-    /// Separated list of secrets to share. Key-Value pair is seperated by a comma. "my_key,my_value"
-    #[arg(long, short)]
-    secret: Vec<String>,
-    #[command(subcommand)]
-    command: Option<Commands>,
+    // /// Separated list of secrets to share. Key-Value pair is seperated by a comma. "my_key,my_value"
+    // #[arg(long, short)]
+    // secret: Vec<String>,
+    /// The mode (share secrets, or rceive secrets).
+    mode: Mode,
+
+    /// Peer ID of the remote to send secrets to.
+    #[clap(long)]
+    remote_peer_id: Option<PeerId>,
 }
 
-#[derive(Subcommand, Debug)]
-enum Commands {
-    ///Starts a UDP server to listen for shared secrets
-    Receive {
-        ///Sets the port to listen on
-        #[arg(short, long = "listen", default_value = "[::1]:4433")]
-        listen: SocketAddr,
-    },
+#[derive(Clone, Debug, PartialEq, Parser)]
+pub enum Mode {
+    Receive,
+    Send,
+}
+
+impl FromStr for Mode {
+    type Err = String;
+    fn from_str(mode: &str) -> Result<Self, Self::Err> {
+        match mode {
+            "send" => Ok(Mode::Send),
+            "receive" => Ok(Mode::Receive),
+            _ => Err("Expected either 'send' or 'receive'".to_string()),
+        }
+    }
 }
 
 #[tokio::main]
@@ -47,23 +54,14 @@ async fn main() {
     )
     .unwrap();
 
-    let opt = Cli::parse();
+    let opts = Cli::parse();
     let code = {
-        match opt.command {
-            None => match client::run(opt).await {
-                Ok(_) => 0,
-                Err(e) => {
-                    eprintln!("ERROR: {e}");
-                    1
-                }
-            },
-            Some(Commands::Receive { listen: _ }) => match server::run().await {
-                Ok(_) => 0,
-                Err(e) => {
-                    eprintln!("ERROR: {e}");
-                    1
-                }
-            },
+        match hole_puncher::punch(opts) {
+            Ok(_) => 1,
+            Err(err) => {
+                error!("{:#?}", err.to_string());
+                1
+            }
         }
     };
     ::std::process::exit(code);
