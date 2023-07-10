@@ -233,15 +233,21 @@ pub fn punch(opts: Cli) -> Result<(), Box<dyn Error>> {
                     peer_id, endpoint, ..
                 } => {
                     info!("Established connection to {:?} via {:?}", peer_id, endpoint);
-                    let request = Secret {
-                        key: "key1".to_string(),
-                        value: "value1".to_string(),
-                    };
-                    info!("Sending secret: {:#?}", request);
-                    swarm
-                        .behaviour_mut()
-                        .request_response
-                        .send_request(&peer_id, request);
+
+                    match opts.mode {
+                        Mode::Send => {
+                            let request = Secret {
+                                key: "key1".to_string(),
+                                value: "value1".to_string(),
+                            };
+                            info!("Sending secret: {:#?}", request);
+                            swarm
+                                .behaviour_mut()
+                                .request_response
+                                .send_request(&peer_id, request);
+                        }
+                        Mode::Receive => {}
+                    }
                 }
                 SwarmEvent::OutgoingConnectionError { peer_id, error, .. } => {
                     info!("Outgoing connection error to {:?}: {:?}", peer_id, error);
