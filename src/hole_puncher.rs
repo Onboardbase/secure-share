@@ -1,12 +1,13 @@
 //This "Direct Connection Upgrade Through Relay Server" (DCUTR) allows peers to establish direct connections with each other.
 //i.e hole punching
 
-use std::{error::Error, process::exit};
+use std::process::exit;
 
 use crate::{
     secret::{Secret, SecretResponse, Status},
     Mode,
 };
+use anyhow::Result;
 use futures::{
     executor::{block_on, ThreadPool},
     stream::StreamExt,
@@ -28,7 +29,7 @@ use tracing::{error, info};
 
 use super::Cli;
 
-pub fn punch(opts: Cli) -> Result<(), Box<dyn Error>> {
+pub fn punch(opts: Cli) -> Result<()> {
     let relay_address: Multiaddr =
         "/ip4/157.245.40.97/tcp/4001/p2p/12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN"
             .to_string()
@@ -238,8 +239,15 @@ pub fn punch(opts: Cli) -> Result<(), Box<dyn Error>> {
                     match opts.mode {
                         Mode::Send => {
                             let secrets = {
-                              //since secrets will only be present in "send" mode, I can afford to `unwrap()`
-                                match Secret::validate_secrets(opts.secret.clone().unwrap()) {
+                                //since secrets will only be present in "send" mode, I can afford to `unwrap()`
+                                let sec = match opts.secret.clone() {
+                                    Some(sec) => sec,
+                                    None => {
+                                        error!("Expected a list of secrets. Use `-s 'key1,value1'` to pass secrets");
+                                        exit(1);
+                                    }
+                                };
+                                match Secret::validate_secrets(sec) {
                                     Ok(secrets) => Secret::secrets_from_string(secrets),
                                     Err(err) => {
                                         error!("{}", err.to_string());
@@ -277,11 +285,11 @@ pub fn punch(opts: Cli) -> Result<(), Box<dyn Error>> {
                         let status = match Secret::bulk_secrets_save(request) {
                             Ok(_) => {
                                 info!("Saved secrets successfully");
-                                Status::SUCCESS
+                                Status::Succes
                             }
                             Err(err) => {
                                 error!("Failed to save secrets: {}", err.to_string());
-                                Status::FAILED
+                                Status::Failed
                             }
                         };
 
@@ -296,8 +304,8 @@ pub fn punch(opts: Cli) -> Result<(), Box<dyn Error>> {
                         request_id: _,
                         response,
                     } => match response.status {
-                        Status::FAILED => error!("Failed to save secret on receiver"),
-                        Status::SUCCESS => info!("Saved secrets on receiver."),
+                        Status::Failed => error!("Failed to save secret on receiver"),
+                        Status::Succes => info!("Saved secrets on receiver."),
                     },
                 },
                 _ => {}

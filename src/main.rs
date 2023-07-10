@@ -25,7 +25,7 @@ pub struct Cli {
 
     ///Port to establish connection on
     #[clap(long, short)]
-    port: Option<i32>
+    port: Option<i32>,
 }
 
 #[derive(Clone, Debug, PartialEq, Parser)]

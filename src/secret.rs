@@ -1,6 +1,6 @@
 use std::{
     cmp::Ordering,
-    fs::File,
+    fs::{self, File},
     io::{BufWriter, Write},
 };
 
@@ -20,8 +20,8 @@ pub struct SecretResponse {
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum Status {
-    FAILED,
-    SUCCESS,
+    Failed,
+    Succes,
 }
 
 impl Secret {
@@ -69,11 +69,14 @@ impl Secret {
     }
 
     pub fn bulk_secrets_save(secrets: Vec<Secret>) -> Result<()> {
-        let dirs = directories_next::ProjectDirs::from("build", "woke", "share").unwrap();
+        let dirs = directories_next::ProjectDirs::from("build", "woke", "wokeshare").unwrap();
         let path = dirs.data_local_dir();
+        fs::create_dir_all(path).context("Failed to create secrets directory")?;
         let secret_default_path = path.join("secrets.json");
-        let secrets_file =
-            File::create(secret_default_path).context("Failed to open secrets file storage")?;
+        let secrets_file = File::create(&secret_default_path).context(format!(
+            "Failed to open secrets file storage at: {:?}",
+            secret_default_path
+        ))?;
         let mut writer = BufWriter::new(secrets_file);
         serde_json::to_writer(&mut writer, &secrets)?;
         writer.flush().context("Failed to save secrets")?;
