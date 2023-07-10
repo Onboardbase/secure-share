@@ -3,6 +3,7 @@
 
 use std::{error::Error, process::exit};
 
+use crate::Mode;
 use futures::{
     executor::{block_on, ThreadPool},
     stream::StreamExt,
@@ -18,9 +19,8 @@ use libp2p::{
     swarm::{NetworkBehaviour, SwarmBuilder, SwarmEvent},
     tcp, yamux, Multiaddr, PeerId, Transport,
 };
+use rand::Rng;
 use tracing::{error, info};
-
-use crate::Mode;
 
 use super::Cli;
 
@@ -30,7 +30,8 @@ pub fn punch(opts: Cli) -> Result<(), Box<dyn Error>> {
             .to_string()
             .parse()
             .unwrap();
-    let secret_key_seed = 2;
+    let secret_key_seed = rand::thread_rng().gen_range(0..100);
+    let port = opts.port.unwrap_or(0).to_string();
 
     let local_key = generate_ed25519(secret_key_seed);
     let local_peer_id = PeerId::from(local_key.public());
@@ -111,7 +112,7 @@ pub fn punch(opts: Cli) -> Result<(), Box<dyn Error>> {
     .build();
 
     swarm
-        .listen_on("/ip4/0.0.0.0/tcp/0".parse().unwrap())
+        .listen_on(format!("/ip4/0.0.0.0/tcp/{port}").parse().unwrap())
         .unwrap();
 
     // Wait to listen on all interfaces.

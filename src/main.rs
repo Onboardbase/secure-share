@@ -21,6 +21,10 @@ pub struct Cli {
     /// Peer ID of the remote to send secrets to.
     #[clap(long)]
     remote_peer_id: Option<PeerId>,
+
+    ///Port to establish connection on
+    #[clap(long, short)]
+    port: Option<i32>
 }
 
 #[derive(Clone, Debug, PartialEq, Parser)]

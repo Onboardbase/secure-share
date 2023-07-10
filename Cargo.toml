@@ -16,3 +16,4 @@ serde = { version = "1.0.166", features = ["derive"] }
 futures = "0.3.28"
 futures-timer = "3.0"
 libp2p = { version = "0.52.1", features = ["async-std", "dns", "dcutr", "identify", "macros", "noise", "ping", "relay", "rendezvous", "tcp", "tokio", "yamux"] }
+rand = "0.8"
