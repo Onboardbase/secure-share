@@ -1,10 +1,10 @@
-//This "Direct Connection Upgrade through Relay" (DCUTR)  allows peers to establish direct connections with each other.
+//This "Direct Connection Upgrade Through Relay Server" (DCUTR) allows peers to establish direct connections with each other.
 //i.e hole punching
 
 use std::{error::Error, process::exit};
 
 use crate::{
-    secret::{Secret, SecretResponse},
+    secret::{Secret, SecretResponse, Status},
     Mode,
 };
 use futures::{
@@ -65,7 +65,7 @@ pub fn punch(opts: Cli) -> Result<(), Box<dyn Error>> {
         ping: ping::Behaviour,
         identify: identify::Behaviour,
         dcutr: dcutr::Behaviour,
-        request_response: json::Behaviour<Secret, SecretResponse>,
+        request_response: json::Behaviour<Vec<Secret>, SecretResponse>,
     }
 
     #[derive(Debug)]
@@ -75,7 +75,7 @@ pub fn punch(opts: Cli) -> Result<(), Box<dyn Error>> {
         Identify(identify::Event),
         Relay(relay::client::Event),
         Dcutr(dcutr::Event),
-        RequestResonse(request_response::Event<Secret, SecretResponse>),
+        RequestResonse(request_response::Event<Vec<Secret>, SecretResponse>),
     }
 
     impl From<ping::Event> for Event {
@@ -102,8 +102,8 @@ pub fn punch(opts: Cli) -> Result<(), Box<dyn Error>> {
         }
     }
 
-    impl From<request_response::Event<Secret, SecretResponse>> for Event {
-        fn from(e: request_response::Event<Secret, SecretResponse>) -> Self {
+    impl From<request_response::Event<Vec<Secret>, SecretResponse>> for Event {
+        fn from(e: request_response::Event<Vec<Secret>, SecretResponse>) -> Self {
             Event::RequestResonse(e)
         }
     }
@@ -116,7 +116,7 @@ pub fn punch(opts: Cli) -> Result<(), Box<dyn Error>> {
             local_key.public(),
         )),
         dcutr: dcutr::Behaviour::new(local_peer_id),
-        request_response: json::Behaviour::<Secret, SecretResponse>::new(
+        request_response: json::Behaviour::<Vec<Secret>, SecretResponse>::new(
             [(
                 StreamProtocol::new("/share-json-protocol"),
                 ProtocolSupport::Full,
@@ -234,23 +234,35 @@ pub fn punch(opts: Cli) -> Result<(), Box<dyn Error>> {
                 } => {
                     info!("Established connection to {:?} via {:?}", peer_id, endpoint);
 
+                    //Send secrets to the receiver
                     match opts.mode {
                         Mode::Send => {
-                            let request = Secret {
-                                key: "key1".to_string(),
-                                value: "value1".to_string(),
+                            let secrets = {
+                              //since secrets will only be present in "send" mode, I can afford to `unwrap()`
+                                match Secret::validate_secrets(opts.secret.clone().unwrap()) {
+                                    Ok(secrets) => Secret::secrets_from_string(secrets),
+                                    Err(err) => {
+                                        error!("{}", err.to_string());
+                                        exit(1);
+                                    }
+                                }
                             };
-                            info!("Sending secret: {:#?}", request);
+
+                            info!("Sending secrets: {:#?}", secrets);
                             swarm
                                 .behaviour_mut()
                                 .request_response
-                                .send_request(&peer_id, request);
+                                .send_request(&peer_id, secrets);
                         }
                         Mode::Receive => {}
                     }
                 }
                 SwarmEvent::OutgoingConnectionError { peer_id, error, .. } => {
-                    info!("Outgoing connection error to {:?}: {:?}", peer_id, error);
+                    error!(
+                        "Outgoing connection error to {:?}: {:?}",
+                        peer_id,
+                        error.to_string()
+                    );
                 }
                 SwarmEvent::Behaviour(Event::RequestResonse(
                     request_response::Event::Message { peer, message },
@@ -261,24 +273,32 @@ pub fn punch(opts: Cli) -> Result<(), Box<dyn Error>> {
                         channel,
                     } => {
                         info!("Received secrets: {:#?} from {:?}", request, peer);
+
+                        let status = match Secret::bulk_secrets_save(request) {
+                            Ok(_) => {
+                                info!("Saved secrets successfully");
+                                Status::SUCCESS
+                            }
+                            Err(err) => {
+                                error!("Failed to save secrets: {}", err.to_string());
+                                Status::FAILED
+                            }
+                        };
+
                         //TODO handle error
                         swarm
                             .behaviour_mut()
                             .request_response
-                            .send_response(
-                                channel,
-                                SecretResponse {
-                                    status: "SUCCESS".to_string(),
-                                },
-                            )
+                            .send_response(channel, SecretResponse { status })
                             .unwrap();
                     }
                     request_response::Message::Response {
                         request_id: _,
                         response,
-                    } => {
-                        info!("Received {} from {:?}", response.status, peer);
-                    }
+                    } => match response.status {
+                        Status::FAILED => error!("Failed to save secret on receiver"),
+                        Status::SUCCESS => info!("Saved secrets on receiver."),
+                    },
                 },
                 _ => {}
             }

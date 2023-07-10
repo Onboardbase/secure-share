@@ -12,9 +12,10 @@ mod secret;
 #[command(version = "0.0.1")]
 #[command(about = "Share secrets securely through the terminal", long_about = None)]
 pub struct Cli {
-    // /// Separated list of secrets to share. Key-Value pair is seperated by a comma. "my_key,my_value"
-    // #[arg(long, short)]
-    // secret: Vec<String>,
+    /// Separated list of secrets to share. Key-Value pair is seperated by a comma. "my_key,my_value"
+    #[arg(long, short)]
+    secret: Option<Vec<String>>,
+
     /// The mode (share secrets, or rceive secrets).
     mode: Mode,
 
