@@ -1417,6 +1417,8 @@ dependencies = [
  "libp2p-swarm",
  "log",
  "rand 0.8.5",
+ "serde",
+ "serde_json",
  "smallvec",
  "void",
 ]
@@ -2294,6 +2296,7 @@ dependencies = [
  "futures",
  "futures-timer",
  "libp2p",
+ "libp2p-request-response",
  "rand 0.8.5",
  "serde",
  "serde_json",

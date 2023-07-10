@@ -4,7 +4,7 @@ use std::str::FromStr;
 use tracing::{error, metadata::LevelFilter};
 
 mod hole_puncher;
-// mod secret;
+mod secret;
 
 #[derive(Parser)]
 #[command(name = "Sharebase")]

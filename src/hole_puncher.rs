@@ -3,7 +3,10 @@
 
 use std::{error::Error, process::exit};
 
-use crate::Mode;
+use crate::{
+    secret::{Secret, SecretResponse},
+    Mode,
+};
 use futures::{
     executor::{block_on, ThreadPool},
     stream::StreamExt,
@@ -17,9 +20,10 @@ use libp2p::{
     multiaddr::Protocol,
     noise, ping, relay,
     swarm::{NetworkBehaviour, SwarmBuilder, SwarmEvent},
-    tcp, yamux, Multiaddr, PeerId, Transport,
+    tcp, yamux, Multiaddr, PeerId, StreamProtocol, Transport,
 };
 use rand::Rng;
+use request_response::{self, json, ProtocolSupport};
 use tracing::{error, info};
 
 use super::Cli;
@@ -61,6 +65,7 @@ pub fn punch(opts: Cli) -> Result<(), Box<dyn Error>> {
         ping: ping::Behaviour,
         identify: identify::Behaviour,
         dcutr: dcutr::Behaviour,
+        request_response: json::Behaviour<Secret, SecretResponse>,
     }
 
     #[derive(Debug)]
@@ -70,6 +75,7 @@ pub fn punch(opts: Cli) -> Result<(), Box<dyn Error>> {
         Identify(identify::Event),
         Relay(relay::client::Event),
         Dcutr(dcutr::Event),
+        RequestResonse(request_response::Event<Secret, SecretResponse>),
     }
 
     impl From<ping::Event> for Event {
@@ -96,6 +102,12 @@ pub fn punch(opts: Cli) -> Result<(), Box<dyn Error>> {
         }
     }
 
+    impl From<request_response::Event<Secret, SecretResponse>> for Event {
+        fn from(e: request_response::Event<Secret, SecretResponse>) -> Self {
+            Event::RequestResonse(e)
+        }
+    }
+
     let behaviour = Behaviour {
         relay_client: client,
         ping: ping::Behaviour::new(ping::Config::new()),
@@ -104,6 +116,13 @@ pub fn punch(opts: Cli) -> Result<(), Box<dyn Error>> {
             local_key.public(),
         )),
         dcutr: dcutr::Behaviour::new(local_peer_id),
+        request_response: json::Behaviour::<Secret, SecretResponse>::new(
+            [(
+                StreamProtocol::new("/share-json-protocol"),
+                ProtocolSupport::Full,
+            )],
+            request_response::Config::default(),
+        ),
     };
     let mut swarm = match ThreadPool::new() {
         Ok(tp) => SwarmBuilder::with_executor(transport, behaviour, local_peer_id, tp),
@@ -214,10 +233,47 @@ pub fn punch(opts: Cli) -> Result<(), Box<dyn Error>> {
                     peer_id, endpoint, ..
                 } => {
                     info!("Established connection to {:?} via {:?}", peer_id, endpoint);
+                    let request = Secret {
+                        key: "key1".to_string(),
+                        value: "value1".to_string(),
+                    };
+                    info!("Sending secret: {:#?}", request);
+                    swarm
+                        .behaviour_mut()
+                        .request_response
+                        .send_request(&peer_id, request);
                 }
                 SwarmEvent::OutgoingConnectionError { peer_id, error, .. } => {
                     info!("Outgoing connection error to {:?}: {:?}", peer_id, error);
                 }
+                SwarmEvent::Behaviour(Event::RequestResonse(
+                    request_response::Event::Message { peer, message },
+                )) => match message {
+                    request_response::Message::Request {
+                        request_id: _,
+                        request,
+                        channel,
+                    } => {
+                        info!("Received secrets: {:#?} from {:?}", request, peer);
+                        //TODO handle error
+                        swarm
+                            .behaviour_mut()
+                            .request_response
+                            .send_response(
+                                channel,
+                                SecretResponse {
+                                    status: "SUCCESS".to_string(),
+                                },
+                            )
+                            .unwrap();
+                    }
+                    request_response::Message::Response {
+                        request_id: _,
+                        response,
+                    } => {
+                        info!("Received {} from {:?}", response.status, peer);
+                    }
+                },
                 _ => {}
             }
         }

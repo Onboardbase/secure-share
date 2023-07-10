@@ -17,3 +17,4 @@ futures = "0.3.28"
 futures-timer = "3.0"
 libp2p = { version = "0.52.1", features = ["async-std", "dns", "dcutr", "identify", "macros", "noise", "ping", "relay", "rendezvous", "tcp", "tokio", "yamux"] }
 rand = "0.8"
+request_response = {version = "0.25.0", package = "libp2p-request-response", features = ["json"] }

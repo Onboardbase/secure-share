@@ -7,6 +7,11 @@ pub struct Secret {
     pub value: String,
 }
 
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct SecretResponse {
+    pub status: String
+}
+
 impl Secret {
     pub fn secrets_from_string(secrets: Vec<String>) -> Vec<Secret> {
         secrets
