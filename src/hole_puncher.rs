@@ -25,10 +25,11 @@ use libp2p::{
 };
 use rand::Rng;
 use request_response::{self, json, ProtocolSupport};
-use tracing::{error, info};
+use tracing::{debug, error, info, instrument};
 
 use super::Cli;
 
+#[instrument(level = "trace")]
 pub fn punch(opts: Cli) -> Result<()> {
     let relay_address: Multiaddr =
         "/ip4/157.245.40.97/tcp/4001/p2p/12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN"
@@ -40,7 +41,7 @@ pub fn punch(opts: Cli) -> Result<()> {
 
     let local_key = generate_ed25519(secret_key_seed);
     let local_peer_id = PeerId::from(local_key.public());
-    info!("Local peer id: {:?}", local_peer_id);
+    info!("Your PeerId is: {}", local_peer_id);
 
     //intitate relay client connection
     let (relay_transport, client) = relay::client::new(local_peer_id);
@@ -170,18 +171,18 @@ pub fn punch(opts: Cli) -> Result<()> {
                 SwarmEvent::ConnectionEstablished { .. } => {}
                 SwarmEvent::Behaviour(Event::Ping(_)) => {}
                 SwarmEvent::Behaviour(Event::Identify(identify::Event::Sent { .. })) => {
-                    info!("Told relay its public address.");
+                    debug!("Told relay its public address.");
                     told_relay_observed_addr = true;
                 }
                 SwarmEvent::Behaviour(Event::Identify(identify::Event::Received {
                     info: identify::Info { observed_addr, .. },
                     ..
                 })) => {
-                    info!("Relay told us our public address: {:?}", observed_addr);
+                    debug!("Relay told us our public address: {:?}", observed_addr);
                     swarm.add_external_address(observed_addr);
                     learned_observed_addr = true;
                 }
-                event => panic!("{event:?}"),
+                event => error!("{event:?}"),
             }
 
             if learned_observed_addr && told_relay_observed_addr {
@@ -218,22 +219,23 @@ pub fn punch(opts: Cli) -> Result<()> {
                     relay::client::Event::ReservationReqAccepted { .. },
                 )) => {
                     assert!(opts.mode == Mode::Receive);
-                    info!("Relay accepted our reservation request.");
+                    debug!("Relay accepted our reservation request.");
                 }
                 SwarmEvent::Behaviour(Event::Relay(event)) => {
-                    info!("{:?}", event)
+                    debug!("RELAY: {:?}", event)
                 }
                 SwarmEvent::Behaviour(Event::Dcutr(event)) => {
-                    info!("{:?}", event)
+                    debug!("DCUTR: {:?}", event)
                 }
                 SwarmEvent::Behaviour(Event::Identify(event)) => {
-                    info!("{:?}", event)
+                    debug!("IDENTIFY: {:?}", event)
                 }
                 SwarmEvent::Behaviour(Event::Ping(_)) => {}
                 SwarmEvent::ConnectionEstablished {
                     peer_id, endpoint, ..
                 } => {
-                    info!("Established connection to {:?} via {:?}", peer_id, endpoint);
+                    let addr = endpoint.get_remote_address();
+                    info!("Established connection to {peer_id} via {addr}");
 
                     //Send secrets to the receiver
                     match opts.mode {
@@ -280,7 +282,7 @@ pub fn punch(opts: Cli) -> Result<()> {
                         request,
                         channel,
                     } => {
-                        info!("Received secrets: {:#?} from {:?}", request, peer);
+                        info!("Received secrets: {:#?} from {peer}", request);
 
                         let status = match Secret::bulk_secrets_save(request) {
                             Ok(_) => {

@@ -19,3 +19,4 @@ libp2p = { version = "0.52.1", features = ["async-std", "dns", "dcutr", "identif
 rand = "0.8"
 request_response = {version = "0.25.0", package = "libp2p-request-response", features = ["json"] }
 directories-next = "2.0.0"
+tracing-appender = "0.2.2"

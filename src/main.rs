@@ -1,12 +1,13 @@
 use clap::Parser;
 use libp2p::PeerId;
 use std::str::FromStr;
-use tracing::{error, metadata::LevelFilter};
+use tracing::error;
 
 mod hole_puncher;
+mod logger;
 mod secret;
 
-#[derive(Parser)]
+#[derive(Parser, Debug)]
 #[command(name = "share")]
 #[command(author = "Wokebuild. <woke.build>")]
 #[command(version = "0.0.7")]
@@ -26,6 +27,10 @@ pub struct Cli {
     ///Port to establish connection on
     #[clap(long, short)]
     port: Option<i32>,
+
+    /// Specify if all logs should be displayed
+    #[arg(long, default_value = "false")]
+    verbose: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Parser)]
@@ -47,19 +52,9 @@ impl FromStr for Mode {
 
 #[tokio::main]
 async fn main() {
-    tracing::subscriber::set_global_default(
-        tracing_subscriber::FmtSubscriber::builder()
-            .pretty()
-            .with_env_filter(
-                tracing_subscriber::EnvFilter::builder()
-                    .with_default_directive(LevelFilter::DEBUG.into())
-                    .from_env_lossy(),
-            )
-            .finish(),
-    )
-    .unwrap();
-
     let opts = Cli::parse();
+    logger::log(&opts).unwrap();
+
     let code = {
         match hole_puncher::punch(opts) {
             Ok(_) => 1,
