@@ -1,0 +1,34 @@
+{
+  "name": "share",
+  "version": "0.0.6",
+  "description": "Share anything with teammates across machines via CLI",
+  "bin": {
+    "my-program": "./npm/run.js"
+  },
+  "scripts": {
+    "postinstall": "node npm/install.js",
+    "preinstall": "node npm/uninstall.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wokebuild/share.git"
+  },
+  "keywords": [
+    "cli",
+    "secrets",
+    "p2p",
+    "quic"
+  ],
+  "author": "Onboardbase",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wokebuild/share/issues"
+  },
+  "homepage": "https://github.com/wokebuild/share#readme",
+  "devDependencies": {
+    "binary-install": "^1.1.0"
+  },
+  "files": [
+    "npm/**/*"
+  ]
+}
