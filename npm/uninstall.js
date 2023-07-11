@@ -6,6 +6,6 @@ function getBinary() {
 }
 
 const binary = getBinary();
-if (binary) {
+if (binary?.uninstall) {
     binary.uninstall();
 }

@@ -15,10 +15,10 @@ function getPlatform() {
 
 function getBinary() {
     const platform = getPlatform();
-    const version = require('../package.json').version;
-    const url = `https://github.com/wokenuild/share/releases/download/wokeshare-v${ version }-${ platform }.tar.gz`;
+    const version = require('./package.json').version;
+    const url = `https://github.com/wokebuild/share/releases/download/v${version}/wokeshare-v${ version }-${ platform }.tar.gz`;
     const name = 'share';
-    return new Binary(url, { name });
+    return new Binary(name, url);
 }
 
 module.exports = getBinary;

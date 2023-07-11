@@ -1,13 +1,13 @@
 {
-  "name": "share",
+  "name": "@wokebuild/share",
   "version": "0.0.7",
   "description": "Share anything with teammates across machines via CLI",
   "bin": {
-    "my-program": "./npm/run.js"
+    "share": "./run.js"
   },
   "scripts": {
-    "postinstall": "node npm/install.js",
-    "preinstall": "node npm/uninstall.js"
+    "postinstall": "node ./install.js",
+    "preinstall": "node ./uninstall.js"
   },
   "repository": {
     "type": "git",
@@ -19,7 +19,7 @@
     "p2p",
     "quic"
   ],
-  "author": "Onboardbase",
+  "author": "Wokebuild",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/wokebuild/share/issues"
@@ -30,5 +30,29 @@
   },
   "files": [
     "npm/**/*"
-  ]
+  ],
+  "main": "getBinary.js",
+  "dependencies": {
+    "axios": "^0.26.1",
+    "balanced-match": "^1.0.2",
+    "brace-expansion": "^1.1.11",
+    "chownr": "^2.0.0",
+    "concat-map": "^0.0.1",
+    "follow-redirects": "^1.15.2",
+    "fs-minipass": "^2.1.0",
+    "fs.realpath": "^1.0.0",
+    "glob": "^7.2.3",
+    "inflight": "^1.0.6",
+    "inherits": "^2.0.4",
+    "minimatch": "^3.1.2",
+    "minipass": "^3.3.6",
+    "minizlib": "^2.1.2",
+    "mkdirp": "^1.0.4",
+    "once": "^1.4.0",
+    "path-is-absolute": "^1.0.1",
+    "rimraf": "^3.0.2",
+    "tar": "^6.1.15",
+    "wrappy": "^1.0.2",
+    "yallist": "^4.0.0"
+  }
 }

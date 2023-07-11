@@ -7,16 +7,16 @@ mod hole_puncher;
 mod secret;
 
 #[derive(Parser)]
-#[command(name = "Sharebase")]
-#[command(author = "Baasit. <bassit@onboardbase.com>")]
-#[command(version = "0.0.1")]
-#[command(about = "Share secrets securely through the terminal", long_about = None)]
+#[command(name = "share")]
+#[command(author = "Wokebuild. <woke.build>")]
+#[command(version = "0.0.7")]
+#[command(about = "Share anything with teammates across machines via CLI.", long_about = None)]
 pub struct Cli {
     /// Separated list of secrets to share. Key-Value pair is seperated by a comma. "my_key,my_value"
     #[arg(long, short)]
     secret: Option<Vec<String>>,
 
-    /// The mode (share secrets, or rceive secrets).
+    /// The mode (share secrets, or receive secrets).
     mode: Mode,
 
     /// Peer ID of the remote to send secrets to.
