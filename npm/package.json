@@ -1,6 +1,6 @@
 {
   "name": "share",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Share anything with teammates across machines via CLI",
   "bin": {
     "my-program": "./npm/run.js"
