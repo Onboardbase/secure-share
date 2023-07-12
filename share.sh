@@ -1,55 +1,103 @@
-#!/bin/bash
+#!/bin/sh
 
-# Check if jq is installed
-if ! command -v jq &> /dev/null; then
-    echo "jq command not found. Please install jq to run this script."
-    exit 1
+# This script installs share.
+#
+# Quick install: `curl https://woke.build/share | bash`
+#
+# This script will install share to the directory you're in. To install
+# somewhere else (e.g. /usr/local/bin), cd there and make sure you can write to
+# that directory, e.g. `cd /usr/local/bin; curl https://woke.build/share | sudo bash`
+#
+# Found a bug? Report it here: https://github.com/wokebuild/share/issues
+#
+# Acknowledgments:
+#  - getmic.ro: https://github.com/benweissmann/getmic.ro
+#  - eget: https://github.com/zyedidia/eget
+
+set -e -u
+
+githubLatestTag() {
+  finalUrl=$(curl "https://github.com/$1/releases/latest" -s -L -I -o /dev/null -w '%{url_effective}')
+  printf "%s\n" "${finalUrl##*v}"
+}
+
+platform=''
+machine=$(uname -m)
+
+# Check the GETSHARE_PALTFORM is set
+if [ "${GETSHARE_PLATFORM:-x}" != "x" ]; then
+  platform="$GETSHARE_PLATFORM"
+else
+  case "$(uname -s | tr '[:upper:]' '[:lower:]')" in
+    "linux")
+      case "$machine" in
+        "arm64"* | "aarch64"* ) platform='aarch64-linux' ;;
+        "arm"* | "aarch"*) platform='aarch64-linux' ;;
+        *"86") platform='x86_64-linux' ;;
+        *"64") platform='x86_64-linux' ;;
+      esac
+      ;;
+    "darwin")
+      case "$machine" in
+        "arm64"* | "aarch64"* ) platform='x86_64-macos' ;;
+        *"64") platform='x86_64-macos' ;;
+      esac
+      ;;
+    "msys"*|"cygwin"*|"mingw"*|*"_nt"*|"win"*)
+      case "$machine" in
+        *"86") platform='x86_64-windows' ;;
+        *"64") platform='x86_64-windows' ;;
+      esac
+      ;;
+  esac
 fi
 
-# Check if GITHUB_API_TOKEN is set
-if [ -z "$GITHUB_API_TOKEN" ]; then
-    echo "GITHUB_API_TOKEN environment variable not found. Please set the token and try again."
-    exit 1
-fi
-
-# Set the repository owner and repository name
-OWNER="wokebuild"
-REPO="share"
-ASSET_NAME="wokeshare-v0.0.4.tar.gz"
-
-# Set your GitHub personal access token
-TOKEN="$GITHUB_API_TOKEN"
-
-# Get the version argument
-VERSION="$1"
-
-if [ -z "$VERSION" ]; then
-    echo "Please provide a version argument."
-    exit 1
-fi
-
-# Retrieve the release information using the GitHub API
-RELEASE_INFO=$(curl -s -H "Authorization: Bearer $TOKEN" "https://api.github.com/repos/$OWNER/$REPO/releases/tags/$VERSION")
-
-# Extract the download URL from the release information
-DOWNLOAD_URL=$(echo "$RELEASE_INFO" | jq -r ".assets[] | select(.name == \"$ASSET_NAME\") | .url")
-
-if [ -z "$DOWNLOAD_URL" ]; then
-  echo "Asset not found: $ASSET_NAME"
+if [ "$platform" = "" ]; then
+  cat << 'EOM'
+/=====================================\\
+|      COULD NOT DETECT PLATFORM      |
+\\=====================================/
+Uh oh! We couldn't automatically detect your operating system.
+To continue with installation, please choose from one of the following values:
+- x86_64-linux
+- aarch64-linux
+- x86_64-macos
+- x86_64-windows
+Export your selection as the GETSHARE_PLATFORM environment variable, and then
+re-run this script.
+For example:
+  $ export GETSHARE_PLATFORM=linux_amd64
+  $ curl https://woke.build/share | bash
+EOM
   exit 1
+else
+  printf "Detected platform: %s\n" "$platform"
 fi
 
-# Download the asset using cURL with authentication headers
-curl -L -H "Authorization: Bearer $TOKEN" -H "Accept: application/octet-stream" -o "$ASSET_NAME" -C - "$DOWNLOAD_URL"
+TAG=$(githubLatestTag wokebuild/share)
 
-# Check if the file was downloaded successfully
-if [ ! -s "$ASSET_NAME" ]; then
-  echo "Failed to download the asset: $ASSET_NAME"
-  exit 1
+if [ "$platform" = "x86_64-windows" ]; then
+  extension='zip'
+else
+  extension='tar.gz'
 fi
 
-# Extract and rename the tar.gz file
-tar -xzf "$ASSET_NAME" --transform 's/^udi-pgp-sqld/udi/'
+printf "Latest Version: %s\n" "$TAG"
+printf "Downloading https://github.com/wokebuild/share/releases/download/v%s/wokeshare-v%s-%s.%s\n" "$TAG" "$TAG" "$platform" "$extension"
+curl -L "https://github.com/wokebuild/share/releases/download/v$TAG/wokeshare-v$TAG-$platform.$extension" > "share.$extension"
 
-# Clean up the downloaded tar.gz file
-rm "$ASSET_NAME"
+case "$extension" in
+  "zip") unzip -j "share.$extension" -d "wokeshare-v$TAG-$platform" ;;
+  "tar.gz") tar -xvzf "share.$extension" "wokeshare-v$TAG-$platform/share" ;;
+esac
+
+mv "wokeshare-v$TAG-$platform/share" ./share
+
+rm "share.$extension"
+rm -rf "wokeshare-v$TAG-$platform"
+
+cat <<-'EOM'
+Share has been downloaded to the current directory.
+You can run it with:
+./share
+EOM
