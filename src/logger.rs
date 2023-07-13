@@ -9,10 +9,9 @@ use tracing_subscriber::{
 };
 
 pub fn log(opts: &Cli) -> Result<()> {
-    let level = if opts.verbose {
-        Level::DEBUG
-    } else {
-        Level::INFO
+    let level = match opts.debug {
+        0 => Level::INFO,
+        _ => Level::DEBUG,
     };
 
     let dirs = directories_next::ProjectDirs::from("build", "woke", "wokeshare").unwrap();

@@ -4,7 +4,7 @@
 use std::process::exit;
 
 use crate::{
-    secret::{Secret, SecretResponse, Status},
+    item::{Item, ItemResponse, ItemType, Status},
     Mode,
 };
 use anyhow::Result;
@@ -28,6 +28,56 @@ use request_response::{self, json, ProtocolSupport};
 use tracing::{debug, error, info, instrument};
 
 use super::Cli;
+
+#[derive(NetworkBehaviour)]
+#[behaviour(to_swarm = "Event")]
+struct Behaviour {
+    relay_client: relay::client::Behaviour,
+    ping: ping::Behaviour,
+    identify: identify::Behaviour,
+    dcutr: dcutr::Behaviour,
+    request_response: json::Behaviour<Vec<Item>, ItemResponse>,
+}
+
+#[derive(Debug)]
+#[allow(clippy::large_enum_variant)]
+enum Event {
+    Ping(ping::Event),
+    Identify(identify::Event),
+    Relay(relay::client::Event),
+    Dcutr(dcutr::Event),
+    RequestResonse(request_response::Event<Vec<Item>, ItemResponse>),
+}
+
+impl From<ping::Event> for Event {
+    fn from(e: ping::Event) -> Self {
+        Event::Ping(e)
+    }
+}
+
+impl From<identify::Event> for Event {
+    fn from(e: identify::Event) -> Self {
+        Event::Identify(e)
+    }
+}
+
+impl From<relay::client::Event> for Event {
+    fn from(e: relay::client::Event) -> Self {
+        Event::Relay(e)
+    }
+}
+
+impl From<dcutr::Event> for Event {
+    fn from(e: dcutr::Event) -> Self {
+        Event::Dcutr(e)
+    }
+}
+
+impl From<request_response::Event<Vec<Item>, ItemResponse>> for Event {
+    fn from(e: request_response::Event<Vec<Item>, ItemResponse>) -> Self {
+        Event::RequestResonse(e)
+    }
+}
 
 #[instrument(level = "trace")]
 pub fn punch(opts: Cli) -> Result<()> {
@@ -60,56 +110,6 @@ pub fn punch(opts: Cli) -> Result<()> {
             .boxed()
     };
 
-    #[derive(NetworkBehaviour)]
-    #[behaviour(to_swarm = "Event")]
-    struct Behaviour {
-        relay_client: relay::client::Behaviour,
-        ping: ping::Behaviour,
-        identify: identify::Behaviour,
-        dcutr: dcutr::Behaviour,
-        request_response: json::Behaviour<Vec<Secret>, SecretResponse>,
-    }
-
-    #[derive(Debug)]
-    #[allow(clippy::large_enum_variant)]
-    enum Event {
-        Ping(ping::Event),
-        Identify(identify::Event),
-        Relay(relay::client::Event),
-        Dcutr(dcutr::Event),
-        RequestResonse(request_response::Event<Vec<Secret>, SecretResponse>),
-    }
-
-    impl From<ping::Event> for Event {
-        fn from(e: ping::Event) -> Self {
-            Event::Ping(e)
-        }
-    }
-
-    impl From<identify::Event> for Event {
-        fn from(e: identify::Event) -> Self {
-            Event::Identify(e)
-        }
-    }
-
-    impl From<relay::client::Event> for Event {
-        fn from(e: relay::client::Event) -> Self {
-            Event::Relay(e)
-        }
-    }
-
-    impl From<dcutr::Event> for Event {
-        fn from(e: dcutr::Event) -> Self {
-            Event::Dcutr(e)
-        }
-    }
-
-    impl From<request_response::Event<Vec<Secret>, SecretResponse>> for Event {
-        fn from(e: request_response::Event<Vec<Secret>, SecretResponse>) -> Self {
-            Event::RequestResonse(e)
-        }
-    }
-
     let behaviour = Behaviour {
         relay_client: client,
         ping: ping::Behaviour::new(ping::Config::new()),
@@ -118,7 +118,7 @@ pub fn punch(opts: Cli) -> Result<()> {
             local_key.public(),
         )),
         dcutr: dcutr::Behaviour::new(local_peer_id),
-        request_response: json::Behaviour::<Vec<Secret>, SecretResponse>::new(
+        request_response: json::Behaviour::<Vec<Item>, ItemResponse>::new(
             [(
                 StreamProtocol::new("/share-json-protocol"),
                 ProtocolSupport::Full,
@@ -240,29 +240,13 @@ pub fn punch(opts: Cli) -> Result<()> {
                     //Send secrets to the receiver
                     match opts.mode {
                         Mode::Send => {
-                            let secrets = {
-                                //since secrets will only be present in "send" mode, I can afford to `unwrap()`
-                                let sec = match opts.secret.clone() {
-                                    Some(sec) => sec,
-                                    None => {
-                                        error!("Expected a list of secrets. Use `-s 'key1,value1'` to pass secrets");
-                                        exit(1);
-                                    }
-                                };
-                                match Secret::validate_secrets(sec) {
-                                    Ok(secrets) => Secret::secrets_from_string(secrets),
-                                    Err(err) => {
-                                        error!("{}", err.to_string());
-                                        exit(1);
-                                    }
-                                }
-                            };
+                            let items = get_items_to_be_sent(&opts);
 
-                            info!("Sending secrets: {:#?}", secrets);
+                            info!("Sending items: {:#?}", items);
                             swarm
                                 .behaviour_mut()
                                 .request_response
-                                .send_request(&peer_id, secrets);
+                                .send_request(&peer_id, items);
                         }
                         Mode::Receive => {}
                     }
@@ -282,33 +266,47 @@ pub fn punch(opts: Cli) -> Result<()> {
                         request,
                         channel,
                     } => {
-                        info!("Received secrets: {:#?} from {peer}", request);
+                        info!("Received {} items from {peer}", request.len());
+                        let mut items_saved_successfully: Vec<&Item> = vec![];
+                        let mut items_saved_fail: Vec<&Item> = vec![];
 
-                        let status = match Secret::bulk_secrets_save(request) {
-                            Ok(_) => {
-                                info!("Saved secrets successfully");
-                                Status::Succes
-                            }
+                        request.iter().for_each(|item| match item.save() {
+                            Ok(_) => items_saved_successfully.push(item),
                             Err(err) => {
-                                error!("Failed to save secrets: {}", err.to_string());
-                                Status::Failed
+                                error!(
+                                    "Failed to save {:?}: {}",
+                                    item.item_type(),
+                                    err.to_string()
+                                );
+                                items_saved_fail.push(item);
                             }
-                        };
+                        });
+
+                        let status = Status::Succes;
 
                         //TODO handle error
                         swarm
                             .behaviour_mut()
                             .request_response
-                            .send_response(channel, SecretResponse { status })
+                            .send_response(
+                                channel,
+                                ItemResponse {
+                                    status,
+                                    no_of_fails: items_saved_fail.len(),
+                                    no_of_success: items_saved_successfully.len(),
+                                },
+                            )
                             .unwrap();
                     }
                     request_response::Message::Response {
                         request_id: _,
                         response,
-                    } => match response.status {
-                        Status::Failed => error!("Failed to save secret on receiver"),
-                        Status::Succes => info!("Saved secrets on receiver."),
-                    },
+                    } => {
+                        info!("Saved {} items successfully", response.no_of_success);
+                        if response.no_of_fails > 0 {
+                            error!("Failed to save{} items", response.no_of_fails);
+                        }
+                    }
                 },
                 _ => {}
             }
@@ -321,4 +319,58 @@ fn generate_ed25519(secret_key_seed: u8) -> identity::Keypair {
     bytes[0] = secret_key_seed;
 
     identity::Keypair::ed25519_from_bytes(bytes).expect("only errors on wrong length")
+}
+
+fn get_items_to_be_sent(opts: &Cli) -> Vec<Item> {
+    if opts.file.is_none() && opts.secret.is_none() && opts.message.is_none() {
+        error!("Pass in a secret with the `-s` flag or a message with `-m` flag or a file path with the `f` flag");
+        exit(1);
+    }
+
+    let mut items = match &opts.secret {
+        None => vec![],
+        Some(secrets) => secrets
+            .iter()
+            .map(
+                |secret| match Item::new(secret.to_string(), ItemType::Secret) {
+                    Err(err) => {
+                        error!("{}", err.to_string());
+                        exit(1);
+                    }
+                    Ok(res) => res,
+                },
+            )
+            .collect::<Vec<_>>(),
+    };
+
+    let mut messages = {
+        match &opts.message {
+            None => vec![],
+            Some(msgs) => msgs
+                .iter()
+                //I can unwrap safely because I don't expect any error
+                .map(|msg| Item::new(msg.clone(), ItemType::Message).unwrap())
+                .collect::<Vec<_>>(),
+        }
+    };
+
+    let mut files = match &opts.file {
+        None => vec![],
+        Some(secrets) => secrets
+            .iter()
+            .map(
+                |secret| match Item::new(secret.to_string(), ItemType::File) {
+                    Err(err) => {
+                        error!("{}", err.to_string());
+                        exit(1);
+                    }
+                    Ok(res) => res,
+                },
+            )
+            .collect::<Vec<_>>(),
+    };
+
+    items.append(&mut messages);
+    items.append(&mut files);
+    items
 }

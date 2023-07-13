@@ -4,8 +4,8 @@ use std::str::FromStr;
 use tracing::error;
 
 mod hole_puncher;
+mod item;
 mod logger;
-mod secret;
 
 #[derive(Parser, Debug)]
 #[command(name = "share")]
@@ -17,20 +17,30 @@ pub struct Cli {
     #[arg(long, short)]
     secret: Option<Vec<String>>,
 
+    /// List of messages or a message string to deliver to the receiver.
+    /// e,g -m "Hi there" -m "See me" or -m "hi there", "See me"
+    #[arg(long, short)]
+    message: Option<Vec<String>>,
+
+    /// List of file paths of files to deliver to the receiver.
+    /// e,g -m "/path/to/file1" -m "../path/to/file2" or -m "path/to/file1", "../path/to/file2"
+    #[arg(long, short)]
+    file: Option<Vec<String>>,
+
     /// The mode (share secrets, or receive secrets).
     mode: Mode,
 
     /// Peer ID of the remote to send secrets to.
-    #[clap(long)]
+    #[clap(long, short)]
     remote_peer_id: Option<PeerId>,
 
     ///Port to establish connection on
     #[clap(long, short)]
     port: Option<i32>,
 
-    /// Specify if all logs should be displayed
-    #[arg(long, default_value = "false")]
-    verbose: bool,
+    /// Turn debugging information on
+    #[arg(short, long, action = clap::ArgAction::Count)]
+    debug: u8,
 }
 
 #[derive(Clone, Debug, PartialEq, Parser)]
