@@ -50,7 +50,6 @@ impl ItemFile {
     pub fn save(&self, path: &Path) -> Result<()> {
         let name = self.name.to_str().unwrap();
         let file_path = path.join(name);
-        println!("{:?}", file_path);
         let mut file = OpenOptions::new()
             .append(true)
             .create(true)

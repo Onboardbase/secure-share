@@ -8,6 +8,7 @@ mod item_message;
 mod secret;
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+//TODO implemnt fmt::Display for all
 pub struct Item {
     item_type: ItemType,
     message: Option<item_message::ItemMessage>,

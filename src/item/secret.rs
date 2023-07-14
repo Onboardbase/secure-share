@@ -40,27 +40,6 @@ impl Secret {
         Ok(secret)
     }
 
-    // pub fn validate_secrets(secrets: Vec<String>) -> Result<Vec<String>> {
-    //     let res = secrets
-    //         .into_iter()
-    //         .map(|secret| {
-    //             let value_key: Vec<&str> = secret.split(',').collect();
-    //             match value_key.len().cmp(&"2".parse::<usize>().unwrap()) {
-    //                 Ordering::Equal => secret,
-    //                 Ordering::Greater => anyhow!(
-    //                     "Secret must contain just key and value. {} violates that rule",
-    //                     secret
-    //                 )
-    //                 .to_string(),
-    //                 Ordering::Less => {
-    //                     anyhow!("Secret cannot be empty. Please check your arguments").to_string()
-    //                 }
-    //             }
-    //         })
-    //         .collect::<Vec<_>>();
-    //     Ok(res)
-    // }
-
     pub fn save_secret(&self, path: &Path) -> Result<()> {
         let secret_default_path = path.join("secrets.json");
         let file = OpenOptions::new()
@@ -81,19 +60,4 @@ impl Secret {
 
         Ok(())
     }
-
-    // pub fn bulk_secrets_save(secrets: Vec<Secret>) -> Result<()> {
-    //     let dirs = directories_next::ProjectDirs::from("build", "woke", "wokeshare").unwrap();
-    //     let path = dirs.data_local_dir();
-    //     fs::create_dir_all(path).context("Failed to create secrets directory")?;
-    //     let secret_default_path = path.join("secrets.json");
-    //     let secrets_file = File::create(&secret_default_path).context(format!(
-    //         "Failed to open secrets file storage at: {:?}",
-    //         secret_default_path
-    //     ))?;
-    //     let mut writer = BufWriter::new(secrets_file);
-    //     serde_json::to_writer(&mut writer, &secrets)?;
-    //     writer.flush().context("Failed to save secrets")?;
-    //     Ok(())
-    // }
 }
