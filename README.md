@@ -129,7 +129,7 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
 - [ ] Configuration File: Enables users to pass in a config file as an argument instead of listing all parameters manually.
   - [ ] Default path to save items(messgaes, secrets and files).
   - [ ] Replace secrets or update them
-  - [ ] When files with same name are received, discard, keep, inform or update them
+  - [ ] When files with the same name are received, discard, keep, inform, or update them
   - [ ] Add a whitelist of IPs to allow connection from
 
 ### Security
@@ -138,7 +138,7 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
 
 ### Protocols
 - [ ] Support QUIC. Use QUIC as default and fall back to TCP
-- [ ] AutoNat: If you look closely, `share` assumes both peers are behind NATs, firewalls, or proxies. But sometimes, this might not be the case, and it is excessive to hole punch just for that. Implementing `AutoNat` will first check if the two peers can communicate with each other directly. If not, it will then proceed to hole punch. With TCP, this might take about 3 to 10 seconds, and this is where QUIC comes in and improves upon `share`'s speed.
+- [ ] AutoNat: If you look closely, `share` assumes both peers are behind NATs, firewalls, or proxies. But sometimes, this might not be the case, and it is excessive to hole punch just for that. Implementing `AutoNat` will first check if the two peers can communicate directly. If not, it will then proceed to hole punch. With TCP, this might take about 3 to 10 seconds, and this is where QUIC comes in and improves upon `share`'s speed.
 
 ### Miscellaneous
 - [ ] Send with URL
