@@ -1,6 +1,6 @@
 <div align="center">
 
-# share [![Release](https://github.com/wokebuild/share/actions/workflows/release.yml/badge.svg)](https://github.com/wokebuild/share/actions/workflows/release.yml)[![Lint](https://github.com/wokebuild/share/actions/workflows/lint.yml/badge.svg)](https://github.com/wokebuild/share/actions/workflows/lint.yml)
+# Woke share [![Release](https://github.com/wokebuild/share/actions/workflows/release.yml/badge.svg)](https://github.com/wokebuild/share/actions/workflows/release.yml)[![Lint](https://github.com/wokebuild/share/actions/workflows/lint.yml/badge.svg)](https://github.com/wokebuild/share/actions/workflows/lint.yml)
 
 Share anything with teammates across machines via CLI
 </div>
@@ -27,11 +27,11 @@ To use `share`,
 ```bash
 yarn add @wokebuild/share # npm i @wokebuild/share
 ```
-or, using curl:
+Or, using curl:
 ```sh
 curl https://wokebuild.github.io | bash
 ```
-Note:  This script will install `share` to the directory you're in. To install it somewhere else (e.g. /usr/local/bin), `cd` there and make sure you can write to that directory, e.g. 
+Note:  This script will install `share` to your directory. To install it somewhere else (e.g.,/usr/local/bin), `cd` there and make sure you can write to that directory, e.g. 
 ```sh
 cd /usr/local/bin
 curl https://wokebuild.github.io | sudo bash
@@ -40,7 +40,7 @@ and then,
 ```shell
 share --help # ./share --help if you used the bash script
 ```
-You should get a reponse displaying the utilties for `share`
+You should get a response displaying the utilities for `share`
 ```
 Share anything with teammates across machines via CLI.
 
@@ -50,7 +50,7 @@ Arguments:
   <MODE>  The mode (send secrets, or receive secrets). e,g `share send` or `share receive`
 Options:
   -s, --secret <SECRET>
-          Separated list of secrets to share. Key-Value pair is seperated by a comma. "my_key,my_value"
+          Separated list of secrets to share. The key-Value pair is separated by a comma. "my_key,my_value"
   -m, --message <MESSAGE>
           List of messages or a message string to deliver to the receiver. e,g -m "Hi there" -m "See me"
   -f, --file <FILE>
@@ -69,14 +69,14 @@ Options:
 
 
 ## Usage
-`share` enables transmission of secrets or messages between teammates using different machines and behind different networks. In order to share a secret, the sender and reciver need to both get `share` as described above and then follow the below instructions.
+`share` enables the transmission of secrets or messages between teammates using different machines and behind different networks. To share a secret, the sender and receiver must both get `share` as described above and follow the instructions below.
 
 #### The receiver:
 Open a terminal or `cd` to where `share` was installed, then:
 ```shell
 ./share receive
 ```
-`share` starts in listen mode and assigns you a `PeerId` and picks a random port to start on. (An optional `-p` flag is available to specify a port). A reponse like below should be displayed:
+`share` starts in listen mode and assigns you a `PeerId`, and picks a random port to start on. (An optional `-p` flag is available to specify a port). A response like the one below should be displayed:
 ```
   2023-07-14T07:40:44.706053Z  INFO share::hole_puncher: Your PeerId is: 12D3KooWBgJMyM6Akfx5hZcaa3F6zXVCpQykNXGqs96pDi4L71DR
 
@@ -90,10 +90,10 @@ Open a terminal or `cd` to where `share` was installed, then:
 #### The sender:
 Obtain the `PeerId` of the teammate you wish to send a secret to, then:
 ```shell
-./share send -r 12D3KooWLaLnHjKhQmB46jweVXCDKVy4AL58a4S4ZgHZGuJkzBf9 -s "hi,welcome"
+./share send -r 12D3KooWLaLnHjKhQmB46jweVXCDKVy4AL58a4S4ZgHZGuJkzBf9 -s "hello, woke"
 ```
 `share` will print your IP address and your `PeerId`.
-To verify that a connection was established and your machine can talk to your teammates, you should see a similar thing like below in your terminal:
+To verify that a connection was established and your machine can talk to your teammates, you should see a similar thing below in your terminal:
 ```
   2023-07-14T07:43:09.253746Z  INFO share::hole_puncher: Your PeerId is: 12D3KooWSKcHXUAmp6FLkgJQ2DM1qVLDkeapXcHdUGtoHuLtqfgc
 
@@ -103,10 +103,10 @@ To verify that a connection was established and your machine can talk to your te
 
   2023-07-14T07:43:16.097707Z  INFO share::hole_puncher: Established connection to 12D3KooWBgJMyM6Akfx5hZcaa3F6zXVCpQykNXGqs96pDi4L71DR via /ip4/157.245.40.97/tcp/4001/p2p/12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN/p2p-circuit/p2p/12D3KooWBgJMyM6Akfx5hZcaa3F6zXVCpQykNXGqs96pDi4L71DR  
 ```
-The sender then attempts to send the secret and if it is successful, `share` relays  messages to both parties notifying them of status and the progress of the secret sharing session.
+The sender then attempts to send the secret, and if it is successful, `share` relays  messages to both parties, notifying them of the status and the progress of the secret sharing session.
 
   ## Files
-  `share` also supports sending file:
+  `share` also supports sending files:
   ```shell
   share send -r 12D3KooWLaLnHjKhQmB46jweVXCDKVy4AL58a4S4ZgHZGuJkzBf9 -f ../path/to/file1 -f path/to/file2
   ```
@@ -119,7 +119,7 @@ The sender then attempts to send the secret and if it is successful, `share` rel
 
 # Contributing
 
-Contributions of any kind welcome! See the [contributing guide](contributing.md).
+Contributions of any kind are welcome! See the [contributing guide](contributing.md).
 
 [Thanks goes to these contributors](https://github.com/wokebuild/share/graphs/contributors)!
 
@@ -128,9 +128,9 @@ Contributions of any kind welcome! See the [contributing guide](contributing.md)
 ### Utilities
 - [ ] Configuration File: Enables users to pass in a config file as an argument instead of listing all parameters manually.
   - [ ] Default path to save items(messgaes, secrets and files).
-  - [ ] Add whitelist of IPs to allow connection from
   - [ ] Replace secrets or update them
   - [ ] When files with same name are received, discard, keep, inform or update them
+  - [ ] Add a whitelist of IPs to allow connection from
 
 ### Security
 - [ ] Signed Certificates from Let's Encrypt.
@@ -138,7 +138,7 @@ Contributions of any kind welcome! See the [contributing guide](contributing.md)
 
 ### Protocols
 - [ ] Support QUIC. Use QUIC as default and fall back to TCP
-- [ ] AutoNat: If you look closely, `share` assumes both peers are behing NATs, firewalls or proxies. But sometimes, this might not be the case and it is excessive to hole punch just for that. Implementing `AutoNat` will first check if the two peers can communicate with each other directly, if not, it will then proceed to hole punch. With TCP, this might take about 3 to 10 seconds, and this is where QUIC comes in and improves upon `share`'s speed.
+- [ ] AutoNat: If you look closely, `share` assumes both peers are behind NATs, firewalls, or proxies. But sometimes, this might not be the case, and it is excessive to hole punch just for that. Implementing `AutoNat` will first check if the two peers can communicate with each other directly. If not, it will then proceed to hole punch. With TCP, this might take about 3 to 10 seconds, and this is where QUIC comes in and improves upon `share`'s speed.
 
 ### Miscellaneous
 - [ ] Send with URL
@@ -146,7 +146,7 @@ Contributions of any kind welcome! See the [contributing guide](contributing.md)
 
 # License
 
-See [LICENSE](LICENSE) © [Woke Build](https://github.com/wokebuild/)
+See [LICENSE](LICENSE) © [Woke](https://github.com/wokebuild/)
 
 # Technicals
 
