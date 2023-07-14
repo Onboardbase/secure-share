@@ -49,9 +49,12 @@ impl ItemFile {
 
     pub fn save(&self, path: &Path) -> Result<()> {
         let name = self.name.to_str().unwrap();
-        let ext = self.extension.to_str().unwrap();
-        let file_path = path.join(format!("{name}.{ext}"));
-        let mut file = OpenOptions::new().append(true).open(file_path)?;
+        let file_path = path.join(name);
+        println!("{:?}", file_path);
+        let mut file = OpenOptions::new()
+            .append(true)
+            .create(true)
+            .open(file_path)?;
         file.write_all(&self.data)?;
         Ok(())
     }

@@ -9,18 +9,19 @@ use tracing_subscriber::{
 };
 
 pub fn log(opts: &Cli) -> Result<()> {
-    let level = match opts.debug {
-        0 => Level::INFO,
-        _ => Level::DEBUG,
+    let (level, source_location) = match opts.debug {
+        0 => (Level::INFO, false),
+        _ => (Level::DEBUG, true),
     };
 
+    println!("{:?}", level);
     let dirs = directories_next::ProjectDirs::from("build", "woke", "wokeshare").unwrap();
     let path = dirs.data_local_dir();
     let path = path.join("logs");
     fs::create_dir_all(&path).context("Failed to create logs directory")?;
 
     let file_appender =
-        tracing_appender::rolling::hourly(path, "service.log").with_max_level(Level::DEBUG);
+        tracing_appender::rolling::hourly(path, "service.log").with_max_level(level);
     let stdout = std::io::stdout.with_max_level(level);
 
     // let mk_writer = std::io::stderr
@@ -31,8 +32,9 @@ pub fn log(opts: &Cli) -> Result<()> {
     // );
 
     tracing_subscriber::fmt()
-        .event_format(format().pretty().with_source_location(false))
+        .event_format(format().pretty().with_source_location(source_location))
         .with_writer(stdout.and(file_appender))
+        .with_max_level(level)
         .init();
 
     Ok(())

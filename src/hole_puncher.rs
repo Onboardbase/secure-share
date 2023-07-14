@@ -271,7 +271,10 @@ pub fn punch(opts: Cli) -> Result<()> {
                         let mut items_saved_fail: Vec<&Item> = vec![];
 
                         request.iter().for_each(|item| match item.save() {
-                            Ok(_) => items_saved_successfully.push(item),
+                            Ok(_) => {
+                                info!("Saved {:?} successfully", item.item_type(),);
+                                items_saved_successfully.push(item)
+                            }
                             Err(err) => {
                                 error!(
                                     "Failed to save {:?}: {}",
@@ -304,7 +307,7 @@ pub fn punch(opts: Cli) -> Result<()> {
                     } => {
                         info!("Saved {} items successfully", response.no_of_success);
                         if response.no_of_fails > 0 {
-                            error!("Failed to save{} items", response.no_of_fails);
+                            error!("Failed to save {} items", response.no_of_fails);
                         }
                     }
                 },

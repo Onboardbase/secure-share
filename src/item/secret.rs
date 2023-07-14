@@ -65,12 +65,14 @@ impl Secret {
         let secret_default_path = path.join("secrets.json");
         let file = OpenOptions::new()
             .read(true)
-            // .append(true)
+            .write(true)
             .create(true)
             .open(secret_default_path)?;
 
         let reader = BufReader::new(file.try_clone()?);
-        let mut contents: Vec<Secret> = serde_json::from_reader(reader)?;
+        //in case the file was just created and it is empty, automatically add a column and then push the result
+        let empty: Result<Vec<Secret>> = Ok(vec![]);
+        let mut contents: Vec<Secret> = serde_json::from_reader(reader).or(empty)?;
         contents.push(self.clone());
 
         let mut writer = BufWriter::new(file);
