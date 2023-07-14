@@ -2346,7 +2346,7 @@ dependencies = [
 
 [[package]]
 name = "share"
-version = "0.0.7"
+version = "0.0.8"
 dependencies = [
  "anyhow",
  "cargo-husky",
