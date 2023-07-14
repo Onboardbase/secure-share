@@ -140,7 +140,7 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
 
 # License
 
-See [LICENSE](LICENSE) © [Woke Build](https://github.com/wokebuild/)
+See [LICENSE](LICENSE) © [Woke](https://github.com/wokebuild/)
 
 # Technicals
 
