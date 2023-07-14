@@ -52,9 +52,9 @@ Options:
   -s, --secret <SECRET>
           Separated list of secrets to share. Key-Value pair is seperated by a comma. "my_key,my_value"
   -m, --message <MESSAGE>
-          List of messages or a message string to deliver to the receiver. e,g -m "Hi there" -m "See me" or -m "hi there", "See me"
+          List of messages or a message string to deliver to the receiver. e,g -m "Hi there" -m "See me"
   -f, --file <FILE>
-          List of file paths of files to deliver to the receiver. e,g -m "/path/to/file1" -m "../path/to/file2" or -m "path/to/file1", "../path/to/file2"
+          List of file paths of files to deliver to the receiver. e,g -f "/path/to/file1" -f "../path/to/file2"
   -r, --remote-peer-id <REMOTE_PEER_ID>
           Peer ID of the remote to send secrets to
   -p, --port <PORT>

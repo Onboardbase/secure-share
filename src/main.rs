@@ -18,12 +18,12 @@ pub struct Cli {
     secret: Option<Vec<String>>,
 
     /// List of messages or a message string to deliver to the receiver.
-    /// e,g -m "Hi there" -m "See me" or -m "hi there", "See me"
+    /// e,g -m "Hi there" -m "See me"
     #[arg(long, short)]
     message: Option<Vec<String>>,
 
     /// List of file paths of files to deliver to the receiver.
-    /// e,g -m "/path/to/file1" -m "../path/to/file2" or -m "path/to/file1", "../path/to/file2"
+    /// e,g -f "/path/to/file1" -f "../path/to/file2"
     #[arg(long, short)]
     file: Option<Vec<String>>,
 
