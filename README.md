@@ -129,6 +129,8 @@ Contributions of any kind welcome! See the [contributing guide](contributing.md)
 - [ ] Configuration File: Enables users to pass in a config file as an argument instead of listing all parameters manually.
   - [ ] Default path to save items(messgaes, secrets and files).
   - [ ] Add whitelist of IPs to allow connection from
+  - [ ] Replace secrets or update them
+  - [ ] When files with same name are received, discard, keep, inform or update them
 
 ### Security
 - [ ] Signed Certificates from Let's Encrypt.
@@ -137,6 +139,10 @@ Contributions of any kind welcome! See the [contributing guide](contributing.md)
 ### Protocols
 - [ ] Support QUIC. Use QUIC as default and fall back to TCP
 - [ ] AutoNat: If you look closely, `share` assumes both peers are behing NATs, firewalls or proxies. But sometimes, this might not be the case and it is excessive to hole punch just for that. Implementing `AutoNat` will first check if the two peers can communicate with each other directly, if not, it will then proceed to hole punch. With TCP, this might take about 3 to 10 seconds, and this is where QUIC comes in and improves upon `share`'s speed.
+
+### Miscellaneous
+- [ ] Send with URL
+- [ ] Personalize Peer ID
 
 # License
 
