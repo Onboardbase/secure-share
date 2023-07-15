@@ -143,6 +143,7 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
 ### Miscellaneous
 - [ ] Send with URL
 - [ ] Personalize Peer ID
+- [ ] Teams
 
 # License
 
