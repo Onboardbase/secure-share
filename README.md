@@ -152,3 +152,4 @@ See [LICENSE](LICENSE) © [Woke](https://github.com/wokebuild/)
 
 The major technical detail `share` employs under the hood is P2P sharing. Below are great and detailed resources on P2P sharing and hole punching. Happy reading!!
   - https://blog.ipfs.tech/2022-01-20-libp2p-hole-punching/
+  - https://tailscale.com/blog/how-nat-traversal-works/
