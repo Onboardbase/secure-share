@@ -96,8 +96,49 @@ mv "wokeshare-v$TAG-$platform/share" ./share
 rm "share.$extension"
 rm -rf "wokeshare-v$TAG-$platform"
 
+##Make share globally executable
+executable="share"
+
+# Check the operating system
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+  # Windows
+  bin_dir="$HOME/bin"
+  executable_path="$bin_dir/$executable"
+
+  # Create the bin directory if it doesn't exist
+  if [ ! -d "$bin_dir" ]; then
+    mkdir "$bin_dir"
+  fi
+
+  # Copy the executable to the bin directory
+  cp "$executable" "$executable_path"
+
+  # Set executable permissions
+  chmod +x "$executable_path"
+
+  # Add the bin directory to the PATH environment variable
+  echo "export PATH=\$PATH:$bin_dir" >> "$HOME/.bashrc"
+
+elif [[ "$OSTYPE" == "linux-gnu"* || "$OSTYPE" == "darwin"* ]]; then
+  # Linux or macOS
+  executable_path="/usr/local/bin/$executable"
+
+  # Copy the executable to the /usr/local/bin directory
+  sudo cp "$executable" "$executable_path"
+
+  # Set executable permissions
+  sudo chmod +x "$executable_path"
+
+else
+  # Unsupported operating system
+  echo "Unsupported operating system: $OSTYPE"
+  exit 1
+fi
+
+rm -rf $executable
+
 cat <<-'EOM'
-Share has been downloaded to the current directory.
+Share has been downloaded and is now globally accessible.
 You can run it with:
-./share
+share --help
 EOM

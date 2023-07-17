@@ -32,12 +32,8 @@ Or, using curl:
 curl https://wokebuild.github.io | bash
 ```
 Notes:
-- For windows users using `Command Prompt` or `Powershell`, use the script without `sudo`.
-- This script will install `share` to your directory. To install it somewhere else (e.g.,/usr/local/bin), `cd` there and make sure you can write to that directory, e.g. 
-```sh
-cd /usr/local/bin
-curl https://wokebuild.github.io | sudo bash
-```
+- For windows users, please use `Git Bash` or any other CLI with the Bourne Shell.
+
 and then,
 ```shell
 share --help # ./share --help if you used the bash script
@@ -76,7 +72,7 @@ Options:
 #### The receiver:
 Open a terminal or `cd` to where `share` was installed, then:
 ```shell
-./share receive
+share receive
 ```
 `share` starts in listen mode and assigns you a `PeerId`, and picks a random port to start on. (An optional `-p` flag is available to specify a port). A response like the one below should be displayed:
 ```
@@ -92,7 +88,7 @@ Open a terminal or `cd` to where `share` was installed, then:
 #### The sender:
 Obtain the `PeerId` of the teammate you wish to send a secret to, then:
 ```shell
-./share send -r 12D3KooWLaLnHjKhQmB46jweVXCDKVy4AL58a4S4ZgHZGuJkzBf9 -s "hello, woke"
+share send -r 12D3KooWLaLnHjKhQmB46jweVXCDKVy4AL58a4S4ZgHZGuJkzBf9 -s "hello, woke"
 ```
 `share` will print your IP address and your `PeerId`.
 To verify that a connection was established and your machine can talk to your teammates, you should see a similar thing below in your terminal:
