@@ -1,6 +1,6 @@
 <div align="center">
 
-# Woke share [![Release](https://github.com/wokebuild/share/actions/workflows/release.yml/badge.svg)](https://github.com/wokebuild/share/actions/workflows/release.yml)[![Lint](https://github.com/wokebuild/share/actions/workflows/lint.yml/badge.svg)](https://github.com/wokebuild/share/actions/workflows/lint.yml)
+# share [![Release](https://github.com/wokebuild/share/actions/workflows/release.yml/badge.svg)](https://github.com/wokebuild/share/actions/workflows/release.yml)[![Lint](https://github.com/wokebuild/share/actions/workflows/lint.yml/badge.svg)](https://github.com/wokebuild/share/actions/workflows/lint.yml)
 
 Share anything with teammates across machines via CLI
 </div>
@@ -31,7 +31,9 @@ Or, using curl:
 ```sh
 curl https://wokebuild.github.io | bash
 ```
-Note:  This script will install `share` to your directory. To install it somewhere else (e.g.,/usr/local/bin), `cd` there and make sure you can write to that directory, e.g. 
+Notes:
+- For windows users using `Command Prompt` or `Powershell`, use the script without `sudo`.
+- This script will install `share` to your directory. To install it somewhere else (e.g.,/usr/local/bin), `cd` there and make sure you can write to that directory, e.g. 
 ```sh
 cd /usr/local/bin
 curl https://wokebuild.github.io | sudo bash

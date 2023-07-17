@@ -251,12 +251,10 @@ pub fn punch(opts: Cli) -> Result<()> {
                         Mode::Receive => {}
                     }
                 }
-                SwarmEvent::OutgoingConnectionError { peer_id, error, .. } => {
-                    error!(
-                        "Outgoing connection error to {:?}: {:?}",
-                        peer_id,
-                        error.to_string()
-                    );
+                SwarmEvent::OutgoingConnectionError {
+                    peer_id: _, error, ..
+                } => {
+                    error!("{:#?}", error.to_string());
                 }
                 SwarmEvent::Behaviour(Event::RequestResonse(
                     request_response::Event::Message { peer, message },

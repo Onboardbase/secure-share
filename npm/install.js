@@ -1,2 +1,4 @@
-const getBinary = require('./getBinary');
-getBinary().install();
+#!/usr/bin/env node
+
+const { install } = require("./binary");
+install();

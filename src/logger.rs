@@ -14,7 +14,6 @@ pub fn log(opts: &Cli) -> Result<()> {
         _ => (Level::DEBUG, true),
     };
 
-    println!("{:?}", level);
     let dirs = directories_next::ProjectDirs::from("build", "woke", "wokeshare").unwrap();
     let path = dirs.data_local_dir();
     let path = path.join("logs");
@@ -32,7 +31,13 @@ pub fn log(opts: &Cli) -> Result<()> {
     // );
 
     tracing_subscriber::fmt()
-        .event_format(format().pretty().with_source_location(source_location))
+        .event_format(
+            format()
+                .pretty()
+                .with_source_location(source_location)
+                .with_target(source_location)
+                .without_time(),
+        )
         .with_writer(stdout.and(file_appender))
         .with_max_level(level)
         .init();

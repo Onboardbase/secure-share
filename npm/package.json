@@ -2,12 +2,12 @@
   "name": "@wokebuild/share",
   "version": "0.0.8",
   "description": "Share anything with teammates across machines via CLI",
-  "bin": {
-    "share": "./run.js"
-  },
   "scripts": {
-    "postinstall": "node ./install.js",
-    "preinstall": "node ./uninstall.js"
+    "test": "jest",
+    "postinstall": "node ./install.js"
+  },
+   "bin": {
+    "share": "run.js"
   },
   "repository": {
     "type": "git",
@@ -26,18 +26,21 @@
   },
   "homepage": "https://github.com/wokebuild/share#readme",
   "devDependencies": {
-    "binary-install": "^1.1.0"
+    "binary-install": "^1.1.0",
+    "jest": "^27.5.1",
+    "prettier": "^1.19.1",
+    "shelljs": "^0.8.5"
   },
   "files": [
     "npm/**/*"
   ],
-  "main": "getBinary.js",
   "dependencies": {
     "axios": "^0.26.1",
     "balanced-match": "^1.0.2",
     "brace-expansion": "^1.1.11",
     "chownr": "^2.0.0",
     "concat-map": "^0.0.1",
+    "console.table": "^0.10.0",
     "follow-redirects": "^1.15.2",
     "fs-minipass": "^2.1.0",
     "fs.realpath": "^1.0.0",
