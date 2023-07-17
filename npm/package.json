@@ -1,6 +1,6 @@
 {
   "name": "@wokebuild/share",
-  "version": "0.0.9",
+  "version": "0.0.11",
   "description": "Share anything with teammates across machines via CLI",
   "scripts": {
     "test": "jest",
