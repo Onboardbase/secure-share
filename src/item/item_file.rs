@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use std::{
     ffi::OsString,
     fs::{File, OpenOptions},
@@ -6,6 +6,7 @@ use std::{
     path::Path,
     u8,
 };
+use tracing::error;
 
 use serde::{Deserialize, Serialize};
 
@@ -22,14 +23,11 @@ impl ItemFile {
         let path = Path::new(&file_path);
 
         if !path.exists() {
-            return Err(anyhow!("File at {:?} does not exist", file_path));
+            error!("File at {:?} does not exist", file_path);
         }
 
         if path.is_dir() {
-            return Err(anyhow!(
-                "File at {:?} is a directory, not a file",
-                file_path
-            ));
+            error!("File at {:?} is a directory, not a file", file_path);
         }
         let file_name = path.file_name().unwrap().to_os_string();
         let extension = path.extension().unwrap_or_default().to_os_string();

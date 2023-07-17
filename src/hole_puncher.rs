@@ -242,7 +242,7 @@ pub fn punch(opts: Cli) -> Result<()> {
                         Mode::Send => {
                             let items = get_items_to_be_sent(&opts);
 
-                            info!("Sending items: {:#?}", items);
+                            info!("Sending {} items", items.len());
                             swarm
                                 .behaviour_mut()
                                 .request_response
@@ -270,12 +270,12 @@ pub fn punch(opts: Cli) -> Result<()> {
 
                         request.iter().for_each(|item| match item.save() {
                             Ok(_) => {
-                                info!("Saved {:?} successfully", item.item_type(),);
+                                info!("Sent {:?} successfully", item.item_type(),);
                                 items_saved_successfully.push(item)
                             }
                             Err(err) => {
                                 error!(
-                                    "Failed to save {:?}: {}",
+                                    "Failed to send {:?}: {}",
                                     item.item_type(),
                                     err.to_string()
                                 );
@@ -354,20 +354,18 @@ fn get_items_to_be_sent(opts: &Cli) -> Vec<Item> {
                 .collect::<Vec<_>>(),
         }
     };
-
     let mut files = match &opts.file {
         None => vec![],
-        Some(secrets) => secrets
+        Some(paths) => paths
             .iter()
-            .map(
-                |secret| match Item::new(secret.to_string(), ItemType::File) {
-                    Err(err) => {
-                        error!("{}", err.to_string());
-                        exit(1);
-                    }
-                    Ok(res) => res,
-                },
-            )
+            .map(|path| match Item::new(path.to_string(), ItemType::File) {
+                Err(err) => {
+                    println!("{:#?}", err);
+                    error!("{}", err.to_string());
+                    exit(1);
+                }
+                Ok(res) => res,
+            })
             .collect::<Vec<_>>(),
     };
 
