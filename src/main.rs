@@ -10,7 +10,7 @@ mod logger;
 #[derive(Parser, Debug)]
 #[command(name = "share")]
 #[command(author = "Wokebuild. <woke.build>")]
-#[command(version = "0.0.8")]
+#[command(version = "0.0.9")]
 #[command(about = "Share anything with teammates across machines via CLI.", long_about = None)]
 pub struct Cli {
     /// Separated list of secrets to share. Key-Value pair is seperated by a comma. "my_key,my_value"
