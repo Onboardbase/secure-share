@@ -55,34 +55,37 @@ Options:
 #### The receiver:
 Open a terminal or `cd` to where `share` was installed, then:
 ```shell
-./share receive
+share receive
 ```
 `share` starts in listen mode and assigns you a `PeerId` and picks a random port to start on. (An optional `-p` flag is available to specify a port). A reponse like below should be displayed:
+
 ```
-  2023-07-14T07:40:44.706053Z  INFO share::hole_puncher: Your PeerId is: 12D3KooWBgJMyM6Akfx5hZcaa3F6zXVCpQykNXGqs96pDi4L71DR
+INFO  Your PeerId is: 12D3KooWA768LzHMatxkjD1f9DrYW375GZJr6MHPCNEdDtHeTNRt
 
-  2023-07-14T07:40:44.712711Z  INFO share::hole_puncher: Listening on "/ip4/127.0.0.1/tcp/35459"
+INFO  Listening on "/ip4/172.19.192.1/tcp/54654"
 
-  2023-07-14T07:40:44.712996Z  INFO share::hole_puncher: Listening on "/ip4/172.19.198.56/tcp/35459"
+INFO  Listening on "/ip4/192.168.0.197/tcp/54654"
 
-  2023-07-14T07:40:49.934254Z  INFO share::hole_puncher: Listening on "/ip4/157.245.40.97/tcp/4001/p2p/12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN/p2p-circuit/p2p/12D3KooWBgJMyM6Akfx5hZcaa3F6zXVCpQykNXGqs96pDi4L71DR"
+INFO  Listening on "/ip4/127.0.0.1/tcp/54654"
+
+INFO  Listening on "/ip4/157.245.40.97/tcp/4001/p2p/12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN/p2p-circuit/p2p/12D3KooWA768LzHMatxkjD1f9DrYW375GZJr6MHPCNEdDtHeTNRt"
 ```
 
 #### The sender:
 Obtain the `PeerId` of the teammate you wish to send a secret to, then:
 ```shell
-./share send -r 12D3KooWLaLnHjKhQmB46jweVXCDKVy4AL58a4S4ZgHZGuJkzBf9 -s "hi,welcome"
+share send -r 12D3KooWLaLnHjKhQmB46jweVXCDKVy4AL58a4S4ZgHZGuJkzBf9 -s "hi,welcome"
 ```
 `share` will print your IP address and your `PeerId`.
 To verify that a connection was established and your machine can talk to your teammates, you should see a similar thing like below in your terminal:
 ```
-  2023-07-14T07:43:09.253746Z  INFO share::hole_puncher: Your PeerId is: 12D3KooWSKcHXUAmp6FLkgJQ2DM1qVLDkeapXcHdUGtoHuLtqfgc
+   INFO  Your PeerId is: 12D3KooWRpqX3QUvPNHXW5utkceLbx2b1LKfuAKa3iLdXXBGB2bY
 
-  2023-07-14T07:43:09.256025Z  INFO share::hole_puncher: Listening on "/ip4/127.0.0.1/tcp/44335"
+   INFO  Listening on "/ip4/127.0.0.1/tcp/40479"
 
-  2023-07-14T07:43:09.256189Z  INFO share::hole_puncher: Listening on "/ip4/192.168.10.236/tcp/44335"
+   INFO  Listening on "/ip4/192.168.212.254/tcp/40479"
 
-  2023-07-14T07:43:16.097707Z  INFO share::hole_puncher: Established connection to 12D3KooWBgJMyM6Akfx5hZcaa3F6zXVCpQykNXGqs96pDi4L71DR via /ip4/157.245.40.97/tcp/4001/p2p/12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN/p2p-circuit/p2p/12D3KooWBgJMyM6Akfx5hZcaa3F6zXVCpQykNXGqs96pDi4L71DR  
+   INFO  Established connection to 12D3KooWA768LzHMatxkjD1f9DrYW375GZJr6MHPCNEdDtHeTNRt via /ip4/157.245.40.97/tcp/4001/p2p/12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN/p2p-circuit/p2p/12D3KooWA768LzHMatxkjD1f9DrYW375GZJr6MHPCNEdDtHeTNRt
 ```
 The sender then attempts to send the secret and if it is successful, `share` relays  messages to both parties notifying them of status and the progress of the secret sharing session.
 
