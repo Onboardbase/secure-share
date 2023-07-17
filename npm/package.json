@@ -26,16 +26,13 @@
   },
   "homepage": "https://github.com/wokebuild/share#readme",
   "devDependencies": {
-    "binary-install": "^1.1.0",
     "jest": "^27.5.1",
     "prettier": "^1.19.1",
     "shelljs": "^0.8.5"
   },
-  "files": [
-    "npm/**/*"
-  ],
   "dependencies": {
     "axios": "^0.26.1",
+    "binary-install": "^1.1.0",
     "balanced-match": "^1.0.2",
     "brace-expansion": "^1.1.11",
     "chownr": "^2.0.0",
