@@ -12,6 +12,7 @@ Share anything with teammates across machines via CLI
 - [Usage](#usage)
   - [Files](#files)
   - [Messages](#messages)
+  - [Configuration](#configuration)
 - [Update](#update)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
@@ -77,13 +78,9 @@ share receive
 `share` starts in listen mode and assigns you a `PeerId`, and picks a random port to start on. (An optional `-p` flag is available to specify a port). A response like the one below should be displayed:
 ```
 INFO  Your PeerId is: 12D3KooWA768LzHMatxkjD1f9DrYW375GZJr6MHPCNEdDtHeTNRt
-
 INFO  Listening on "/ip4/172.19.192.1/tcp/54654"
-
 INFO  Listening on "/ip4/192.168.0.197/tcp/54654"
-
 INFO  Listening on "/ip4/127.0.0.1/tcp/54654"
-
 INFO  Listening on "/ip4/157.245.40.97/tcp/4001/p2p/12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN/p2p-circuit/p2p/12D3KooWA768LzHMatxkjD1f9DrYW375GZJr6MHPCNEdDtHeTNRt"
 ```
 
@@ -96,11 +93,8 @@ share send -r 12D3KooWA768LzHMatxkjD1f9DrYW375GZJr6MHPCNEdDtHeTNRt -s "hello, wo
 To verify that a connection was established and your machine can talk to your teammates, you should see a similar thing below in your terminal:
 ```
 INFO  Your PeerId is: 12D3KooWRpqX3QUvPNHXW5utkceLbx2b1LKfuAKa3iLdXXBGB2bY
-
 INFO  Listening on "/ip4/127.0.0.1/tcp/40479"
-
 INFO  Listening on "/ip4/192.168.212.254/tcp/40479"
-
 INFO  Established connection to 12D3KooWA768LzHMatxkjD1f9DrYW375GZJr6MHPCNEdDtHeTNRt via /ip4/157.245.40.97/tcp/4001/p2p/12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN/p2p-circuit/p2p/12D3KooWA768LzHMatxkjD1f9DrYW375GZJr6MHPCNEdDtHeTNRt
 ```
 
@@ -117,6 +111,19 @@ The sender then attempts to send the secret, and if it is successful, `share` re
   share send -r 12D3KooWLaLnHjKhQmB46jweVXCDKVy4AL58a4S4ZgHZGuJkzBf9 -m "hi there" -m "foo"
   ```
   All three items can also be sent together.
+
+  ## Configuration
+  As of `v0.0.12`, `share` allows a configuration file to be passed. Ports, whitelists and items can all be configured directly instead of passing them as arguments. A sample configuration file can be found [here](./config.yml). For example:
+
+  ```shell
+  share receive -c ./config.yml
+  ```
+  or for senders:
+
+  ```shell
+  share send -r 12D3KooWLaLnHjKhQmB46jweVXCDKVy4AL58a4S4ZgHZGuJkzBf9 -c ./config.yml
+  ```
+
 
 # Contributing
 

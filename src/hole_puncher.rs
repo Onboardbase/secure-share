@@ -269,7 +269,7 @@ pub fn punch(mode: Mode, remote_peer_id: Option<PeerId>, config: Config) -> Resu
 
                         request.iter().for_each(|item| match item.save() {
                             Ok(_) => {
-                                info!("Sent {:?} successfully", item.item_type(),);
+                                info!("Saved {:?} successfully", item.item_type(),);
                                 items_saved_successfully.push(item)
                             }
                             Err(err) => {
@@ -302,7 +302,7 @@ pub fn punch(mode: Mode, remote_peer_id: Option<PeerId>, config: Config) -> Resu
                         request_id: _,
                         response,
                     } => {
-                        info!("Saved {} items successfully", response.no_of_success);
+                        info!("Sent {} items successfully", response.no_of_success);
                         if response.no_of_fails > 0 {
                             error!("Failed to save {} items", response.no_of_fails);
                         }
@@ -348,7 +348,6 @@ fn get_items_to_be_sent(opts: &Config) -> Vec<Item> {
             .iter()
             .map(|path| match Item::new(path.to_string(), ItemType::File) {
                 Err(err) => {
-                    println!("{:#?}", err);
                     error!("{}", err.to_string());
                     exit(1);
                 }
