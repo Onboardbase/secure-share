@@ -267,7 +267,7 @@ pub fn punch(mode: Mode, remote_peer_id: Option<PeerId>, config: Config) -> Resu
                         let mut items_saved_successfully: Vec<&Item> = vec![];
                         let mut items_saved_fail: Vec<&Item> = vec![];
 
-                        request.iter().for_each(|item| match item.save() {
+                        request.iter().for_each(|item| match item.save(&config) {
                             Ok(_) => {
                                 info!("Saved {:?} successfully", item.item_type(),);
                                 items_saved_successfully.push(item)

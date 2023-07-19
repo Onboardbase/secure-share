@@ -1,7 +1,9 @@
-use std::{ffi::OsString, fs};
+use std::ffi::OsString;
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
+
+use crate::config::Config;
 
 mod item_file;
 mod item_message;
@@ -74,10 +76,8 @@ impl Item {
         Ok(item)
     }
 
-    pub fn save(&self) -> Result<()> {
-        let dirs = directories_next::ProjectDirs::from("build", "woke", "wokeshare").unwrap();
-        let path = dirs.data_local_dir();
-        fs::create_dir_all(path).context("Failed to create secrets directory")?;
+    pub fn save(&self, config: &Config) -> Result<()> {
+        let path = &config.save_path();
         match self.item_type {
             ItemType::File => self.file.clone().unwrap().save(path)?,
             ItemType::Message => self.message.clone().unwrap().save(path)?,
