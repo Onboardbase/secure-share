@@ -7,12 +7,18 @@ mod item_file;
 mod item_message;
 mod secret;
 
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
+pub struct Secret {
+    pub key: String,
+    pub value: String,
+}
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 //TODO implemnt fmt::Display for all
 pub struct Item {
     item_type: ItemType,
     message: Option<item_message::ItemMessage>,
-    secret: Option<secret::Secret>,
+    secret: Option<Secret>,
     file: Option<item_file::ItemFile>,
 }
 
@@ -40,7 +46,7 @@ impl Item {
     pub fn new(param: String, item_type: ItemType) -> Result<Self> {
         let item = match item_type {
             ItemType::Secret => {
-                let secret = secret::Secret::secret_from_string(param)?;
+                let secret = Secret::secret_from_string(param)?;
                 Item {
                     item_type,
                     secret: Some(secret),
@@ -82,5 +88,27 @@ impl Item {
 
     pub fn item_type(&self) -> ItemType {
         self.item_type.clone()
+    }
+}
+
+impl From<Secret> for Item {
+    fn from(secret: Secret) -> Item {
+        Item {
+            item_type: ItemType::Secret,
+            secret: Some(secret),
+            message: None,
+            file: None,
+        }
+    }
+}
+
+impl From<&Secret> for Item {
+    fn from(secret: &Secret) -> Item {
+        Item {
+            item_type: ItemType::Secret,
+            secret: Some(secret.clone()),
+            message: None,
+            file: None,
+        }
     }
 }

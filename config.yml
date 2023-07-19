@@ -1,0 +1,13 @@
+port: 5555 #An optional port defaults to 0 if not present
+secret: #Optional during receive
+- key: foo
+  value: bar
+- key: baz
+  value: woo
+message: #Optional during receive
+- new message from me
+- test message
+file: #Optional during receive
+- "/path/to/file1"
+- path/to/file2
+debug: 0 #Compulsory. 0 is for off and 1 and above for on

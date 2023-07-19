@@ -4,6 +4,7 @@
 use std::process::exit;
 
 use crate::{
+    config::Config,
     item::{Item, ItemResponse, ItemType, Status},
     Mode,
 };
@@ -26,8 +27,6 @@ use libp2p::{
 use rand::Rng;
 use request_response::{self, json, ProtocolSupport};
 use tracing::{debug, error, info, instrument};
-
-use super::Cli;
 
 #[derive(NetworkBehaviour)]
 #[behaviour(to_swarm = "Event")]
@@ -80,14 +79,14 @@ impl From<request_response::Event<Vec<Item>, ItemResponse>> for Event {
 }
 
 #[instrument(level = "trace")]
-pub fn punch(opts: Cli) -> Result<()> {
+pub fn punch(mode: Mode, remote_peer_id: Option<PeerId>, config: Config) -> Result<()> {
     let relay_address: Multiaddr =
         "/ip4/157.245.40.97/tcp/4001/p2p/12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN"
             .to_string()
             .parse()
             .unwrap();
     let secret_key_seed = rand::thread_rng().gen_range(0..100);
-    let port = opts.port.unwrap_or(0).to_string();
+    let port = config.port();
 
     let local_key = generate_ed25519(secret_key_seed);
     let local_peer_id = PeerId::from(local_key.public());
@@ -192,13 +191,13 @@ pub fn punch(opts: Cli) -> Result<()> {
     });
 
     //denotes whether to send or receive secrets
-    match opts.mode {
+    match mode {
         Mode::Send => {
             swarm
                 .dial(
                     relay_address
                         .with(Protocol::P2pCircuit)
-                        .with(Protocol::P2p(opts.remote_peer_id.unwrap())),
+                        .with(Protocol::P2p(remote_peer_id.unwrap())),
                 )
                 .unwrap();
         }
@@ -218,7 +217,7 @@ pub fn punch(opts: Cli) -> Result<()> {
                 SwarmEvent::Behaviour(Event::Relay(
                     relay::client::Event::ReservationReqAccepted { .. },
                 )) => {
-                    assert!(opts.mode == Mode::Receive);
+                    assert!(mode == Mode::Receive);
                     debug!("Relay accepted our reservation request.");
                 }
                 SwarmEvent::Behaviour(Event::Relay(event)) => {
@@ -238,9 +237,9 @@ pub fn punch(opts: Cli) -> Result<()> {
                     info!("Established connection to {peer_id} via {addr}");
 
                     //Send secrets to the receiver
-                    match opts.mode {
+                    match mode {
                         Mode::Send => {
-                            let items = get_items_to_be_sent(&opts);
+                            let items = get_items_to_be_sent(&config);
 
                             info!("Sending {} items", items.len());
                             swarm
@@ -322,30 +321,19 @@ fn generate_ed25519(secret_key_seed: u8) -> identity::Keypair {
     identity::Keypair::ed25519_from_bytes(bytes).expect("only errors on wrong length")
 }
 
-fn get_items_to_be_sent(opts: &Cli) -> Vec<Item> {
-    if opts.file.is_none() && opts.secret.is_none() && opts.message.is_none() {
+fn get_items_to_be_sent(opts: &Config) -> Vec<Item> {
+    if opts.file().is_none() && opts.secret().is_none() && opts.message().is_none() {
         error!("Pass in a secret with the `-s` flag or a message with `-m` flag or a file path with the `f` flag");
         exit(1);
     }
 
-    let mut items = match &opts.secret {
+    let mut items = match &opts.secret() {
         None => vec![],
-        Some(secrets) => secrets
-            .iter()
-            .map(
-                |secret| match Item::new(secret.to_string(), ItemType::Secret) {
-                    Err(err) => {
-                        error!("{}", err.to_string());
-                        exit(1);
-                    }
-                    Ok(res) => res,
-                },
-            )
-            .collect::<Vec<_>>(),
+        Some(secrets) => secrets.iter().map(Item::from).collect::<Vec<_>>(),
     };
 
     let mut messages = {
-        match &opts.message {
+        match &opts.message() {
             None => vec![],
             Some(msgs) => msgs
                 .iter()
@@ -354,7 +342,7 @@ fn get_items_to_be_sent(opts: &Cli) -> Vec<Item> {
                 .collect::<Vec<_>>(),
         }
     };
-    let mut files = match &opts.file {
+    let mut files = match &opts.file() {
         None => vec![],
         Some(paths) => paths
             .iter()

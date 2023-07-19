@@ -1,8 +1,10 @@
 use clap::Parser;
+use config::Config;
 use libp2p::PeerId;
-use std::str::FromStr;
+use std::{process::exit, str::FromStr};
 use tracing::error;
 
+mod config;
 mod hole_puncher;
 mod item;
 mod logger;
@@ -42,9 +44,13 @@ pub struct Cli {
     /// Turn debugging information on
     #[arg(short, long, action = clap::ArgAction::Count)]
     debug: u8,
+
+    /// Configuration file for `share`
+    #[arg(short, long)]
+    config: Option<String>,
 }
 
-#[derive(Clone, Debug, PartialEq, Parser)]
+#[derive(Clone, Debug, PartialEq, Parser, Copy)]
 pub enum Mode {
     Receive,
     Send,
@@ -64,10 +70,18 @@ impl FromStr for Mode {
 #[tokio::main]
 async fn main() {
     let opts = Cli::parse();
-    logger::log(&opts).unwrap();
+    let (mode, remote_peer_id, config) = match Config::new(&opts) {
+        Ok(res) => res,
+        Err(err) => {
+            eprintln!("{}", err);
+            exit(1)
+        }
+    };
+
+    logger::log(&config).unwrap();
 
     let code = {
-        match hole_puncher::punch(opts) {
+        match hole_puncher::punch(mode, remote_peer_id, config) {
             Ok(_) => 1,
             Err(err) => {
                 error!("{:#?}", err.to_string());

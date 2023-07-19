@@ -2,16 +2,14 @@ use std::{
     fs::OpenOptions,
     io::{BufReader, BufWriter, Write},
     path::Path,
+    process::exit,
 };
 
 use anyhow::{anyhow, Context, Result};
 use serde::{Deserialize, Serialize};
+use tracing::error;
 
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
-pub struct Secret {
-    pub key: String,
-    pub value: String,
-}
+use super::Secret;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct SecretResponse {
@@ -59,5 +57,29 @@ impl Secret {
         writer.flush().context("Failed to save secrets")?;
 
         Ok(())
+    }
+}
+
+impl From<String> for Secret {
+    fn from(secret: String) -> Secret {
+        match Secret::secret_from_string(secret) {
+            Ok(secret) => secret,
+            Err(err) => {
+                error!("{}", err.to_string());
+                exit(1)
+            }
+        }
+    }
+}
+
+impl From<&String> for Secret {
+    fn from(secret: &String) -> Secret {
+        match Secret::secret_from_string(secret.to_string()) {
+            Ok(secret) => secret,
+            Err(err) => {
+                error!("{}", err.to_string());
+                exit(1)
+            }
+        }
     }
 }

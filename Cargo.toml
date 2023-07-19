@@ -20,6 +20,7 @@ rand = "0.8"
 request_response = {version = "0.25.0", package = "libp2p-request-response", features = ["json"] }
 directories-next = "2.0.0"
 tracing-appender = "0.2.2"
+serde_yaml = "0.9.24"
 
 [dev-dependencies.cargo-husky]
 version = "1"
