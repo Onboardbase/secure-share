@@ -135,9 +135,9 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
 
 ### Utilities
 - [ ] Configuration File: Enables users to pass in a config file as an argument instead of listing all parameters manually.
-  - [ ] Default path to save items(messgaes, secrets and files).
-  - [ ] Replace secrets or update them
-  - [ ] When files with the same name are received, discard, keep, inform, or update them
+  - [x] Default path to save items(messgaes, secrets and files).
+  - [x] Replace secrets or update them
+  - [x] When files with the same name are received, discard, keep, inform, or update them
   - [ ] Add a whitelist of IPs to allow connection from
 
 ### Security

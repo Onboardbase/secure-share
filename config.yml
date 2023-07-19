@@ -15,4 +15,5 @@ message: #Optional during receive
 - test message
 file: #Optional during receive
 - "./dev_build.sh"
-debug: 1 #Compulsory. 0 is for off and 1 and above for on
+debug: 0 #Compulsory. 0 is for off and 1 and above for on
+
