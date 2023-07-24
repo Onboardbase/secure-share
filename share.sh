@@ -8,7 +8,7 @@
 # somewhere else (e.g. /usr/local/bin), cd there and make sure you can write to
 # that directory, e.g. `cd /usr/local/bin; curl https://woke.build/share | sudo bash`
 #
-# Found a bug? Report it here: https://github.com/wokebuild/share/issues
+# Found a bug? Report it here: https://github.com/onboardbase/secure-share/issues
 #
 # Acknowledgments:
 #  - getmic.ro: https://github.com/benweissmann/getmic.ro
@@ -74,7 +74,7 @@ else
   printf "Detected platform: %s\n" "$platform"
 fi
 
-TAG=$(githubLatestTag wokebuild/share)
+TAG=$(githubLatestTag onboardbase/secure-share)
 
 if [ "$platform" = "x86_64-windows" ]; then
   extension='zip'
@@ -83,18 +83,18 @@ else
 fi
 
 printf "Latest Version: %s\n" "$TAG"
-printf "Downloading https://github.com/wokebuild/share/releases/download/v%s/wokeshare-v%s-%s.%s\n" "$TAG" "$TAG" "$platform" "$extension"
-curl -L "https://github.com/wokebuild/share/releases/download/v$TAG/wokeshare-v$TAG-$platform.$extension" > "share.$extension"
+printf "Downloading https://github.com/onboardbase/secure-share/releases/download/v%s/secure-share-v%s-%s.%s\n" "$TAG" "$TAG" "$platform" "$extension"
+curl -L "https://github.com/onboardbase/secure-share/releases/download/v$TAG/secure-share-v$TAG-$platform.$extension" > "share.$extension"
 
 case "$extension" in
-  "zip") unzip -j "share.$extension" -d "wokeshare-v$TAG-$platform" ;;
-  "tar.gz") tar -xvzf "share.$extension" "wokeshare-v$TAG-$platform/share" ;;
+  "zip") unzip -j "share.$extension" -d "secure-share-v$TAG-$platform" ;;
+  "tar.gz") tar -xvzf "share.$extension" "secure-share-v$TAG-$platform/share" ;;
 esac
 
-mv "wokeshare-v$TAG-$platform/share" ./share
+mv "secure-share-v$TAG-$platform/share" ./share
 
 rm "share.$extension"
-rm -rf "wokeshare-v$TAG-$platform"
+rm -rf "secure-share-v$TAG-$platform"
 
 ##Make share globally executable
 executable="share"

@@ -10,8 +10,8 @@ on:
 
 env:
   BIN_NAME: share
-  PROJECT_NAME: wokeshare
-  REPO_NAME: wokebuild/share
+  PROJECT_NAME: secure-share
+  REPO_NAME: onboardbase/share
 
 jobs:
   dist:

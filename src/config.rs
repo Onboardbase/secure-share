@@ -21,7 +21,8 @@ pub struct Config {
 
 impl Config {
     fn create_default_path() -> Result<PathBuf> {
-        let dirs = directories_next::ProjectDirs::from("build", "woke", "wokeshare").unwrap();
+        let dirs =
+            directories_next::ProjectDirs::from("com", "onboardbase", "secureshare").unwrap();
         let path = dirs.data_local_dir();
         fs::create_dir_all(path).context("Failed to create default directory")?;
         Ok(PathBuf::from(path))

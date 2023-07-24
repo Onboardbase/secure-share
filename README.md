@@ -1,6 +1,6 @@
 <div align="center">
 
-# Woke share [![Release](https://github.com/wokebuild/share/actions/workflows/release.yml/badge.svg)](https://github.com/wokebuild/share/actions/workflows/release.yml)[![Lint](https://github.com/wokebuild/share/actions/workflows/lint.yml/badge.svg)](https://github.com/wokebuild/share/actions/workflows/lint.yml)
+# Secure share [![Release](https://github.com/wokebuild/share/actions/workflows/release.yml/badge.svg)](https://github.com/wokebuild/share/actions/workflows/release.yml)[![Lint](https://github.com/wokebuild/share/actions/workflows/lint.yml/badge.svg)](https://github.com/wokebuild/share/actions/workflows/lint.yml)
 
 Share anything with teammates across machines via CLI
 </div>
@@ -26,7 +26,7 @@ Share anything with teammates across machines via CLI
 ## Install 
 To use `share`,
 ```bash
-yarn add @wokebuild/share # npm i @wokebuild/share
+yarn add @onboardbase/secure-share # npm i @onboardbase/secure-share
 ```
 Or, using curl:
 ```sh

@@ -1,17 +1,17 @@
 {
-  "name": "@wokebuild/share",
+  "name": "@onboardbase/secure-share",
   "version": "0.0.12",
   "description": "Share anything with teammates across machines via CLI",
   "scripts": {
     "test": "jest",
     "postinstall": "node ./install.js"
   },
-   "bin": {
+  "bin": {
     "share": "run.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wokebuild/share.git"
+    "url": "https://github.com/Onboardbase/secure-share.git"
   },
   "keywords": [
     "cli",
@@ -19,16 +19,19 @@
     "p2p",
     "quic"
   ],
-  "author": "Wokebuild",
+  "author": "Onboardbase",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/wokebuild/share/issues"
+    "url": "https://github.com/Onboardbase/secure-share/issues"
   },
-  "homepage": "https://github.com/wokebuild/share#readme",
+  "homepage": "https://github.com/Onboardbase/secure-share#readme",
   "devDependencies": {
     "jest": "^27.5.1",
     "prettier": "^1.19.1",
     "shelljs": "^0.8.5"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "axios": "^0.26.1",
@@ -54,5 +57,6 @@
     "tar": "^6.1.15",
     "wrappy": "^1.0.2",
     "yallist": "^4.0.0"
-  }
+  },
+  "main": "binary.js"
 }

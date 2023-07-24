@@ -14,7 +14,7 @@ pub fn log(config: &Config) -> Result<()> {
         true => (Level::DEBUG, true),
     };
 
-    let dirs = directories_next::ProjectDirs::from("build", "woke", "wokeshare").unwrap();
+    let dirs = directories_next::ProjectDirs::from("com", "onboardbase", "secureshare").unwrap();
     let path = dirs.data_local_dir();
     let path = path.join("logs");
     fs::create_dir_all(&path).context("Failed to create logs directory")?;

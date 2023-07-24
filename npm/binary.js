@@ -60,7 +60,7 @@ const getPlatformMetadata = () => {
 
 const getBinary = () => {
   const platformMetadata = getPlatformMetadata();
-  const url = `https://github.com/wokebuild/share/releases/download/v${version}/wokeshare-v${ version }-${ platformMetadata.RUST_TARGET }.tar.gz`;
+  const url = `https://github.com/wokebuild/share/releases/download/v${version}/secure-share-v${ version }-${ platformMetadata.RUST_TARGET }.tar.gz`;
   return new Binary(platformMetadata.BINARY_NAME, url, version);
 };
 

@@ -1,6 +1,6 @@
 <div align="center">
 
-# share 
+# Secure Share 
 
 Share anything with teammates across machines via CLI
 </div>
@@ -16,7 +16,7 @@ Share anything with teammates across machines via CLI
 
 ## Install 
 ```
-yarn add @wokebuild/share # npm i @wokebuild/share
+yarn add @onboardbase/secure-share # npm i @onboardbase/secure-share
 ```
 
 ```bash
