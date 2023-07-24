@@ -1,6 +1,6 @@
 {
   "name": "@onboardbase/secure-share",
-  "version": "0.0.12",
+  "version": "0.0.14",
   "description": "Share anything with teammates across machines via CLI",
   "scripts": {
     "test": "jest",
@@ -34,9 +34,10 @@
     "access": "public"
   },
   "dependencies": {
+    "@onboardbase/secure-share": "^0.0.12",
     "axios": "^0.26.1",
-    "binary-install": "^1.1.0",
     "balanced-match": "^1.0.2",
+    "binary-install": "^1.1.0",
     "brace-expansion": "^1.1.11",
     "chownr": "^2.0.0",
     "concat-map": "^0.0.1",

@@ -511,6 +511,35 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
+"@onboardbase/secure-share@^0.0.12":
+  version "0.0.12"
+  resolved "https://registry.npmjs.org/@onboardbase/secure-share/-/secure-share-0.0.12.tgz"
+  integrity sha512-17S8RE6WpN1bRRxlAK2Hzf5CJUx3mccOiKuJRR3ahk9JH/1pcQ2ryMfMH3MH38EbhmmFZQLi1w9aztJCAQJEtg==
+  dependencies:
+    axios "^0.26.1"
+    balanced-match "^1.0.2"
+    binary-install "^1.1.0"
+    brace-expansion "^1.1.11"
+    chownr "^2.0.0"
+    concat-map "^0.0.1"
+    console.table "^0.10.0"
+    follow-redirects "^1.15.2"
+    fs-minipass "^2.1.0"
+    fs.realpath "^1.0.0"
+    glob "^7.2.3"
+    inflight "^1.0.6"
+    inherits "^2.0.4"
+    minimatch "^3.1.2"
+    minipass "^3.3.6"
+    minizlib "^2.1.2"
+    mkdirp "^1.0.4"
+    once "^1.4.0"
+    path-is-absolute "^1.0.1"
+    rimraf "^3.0.2"
+    tar "^6.1.15"
+    wrappy "^1.0.2"
+    yallist "^4.0.0"
+
 "@sinonjs/commons@^1.7.0":
   version "1.8.6"
   resolved "https://registry.npmjs.org/@sinonjs/commons/-/commons-1.8.6.tgz"
