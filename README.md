@@ -139,7 +139,7 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
   - [x] Replace secrets or update them
   - [x] When files with the same name are received, discard, keep, inform, or update them
   - [ ] Add a whitelist of IPs to allow connection from
-
+- [ ] Publish `share` to crates.io to enable users to `cargo install secure-share`
 ### Security
 - [ ] Signed Certificates from Let's Encrypt.
 - [ ] Whitelists and Blacklists
