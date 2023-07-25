@@ -32,7 +32,7 @@ yarn add @onboardbase/secure-share # npm i @onboardbase/secure-share
 ```
 Or, using curl:
 ```sh
-curl https://wokebuild.github.io | bash
+curl https://onboardbase.github.io/secure-share-sh/ | bash
 ```
 Notes:
 - For Windows users, please use `Git Bash` or any other CLI with the Bourne Shell.

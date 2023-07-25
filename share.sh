@@ -2,11 +2,11 @@
 
 # This script installs share.
 #
-# Quick install: `curl https://woke.build/share | bash`
+# Quick install: `curl https://onboardbase.github.io/secure-share-sh/ | bash`
 #
 # This script will install share to the directory you're in. To install
 # somewhere else (e.g. /usr/local/bin), cd there and make sure you can write to
-# that directory, e.g. `cd /usr/local/bin; curl https://woke.build/share | sudo bash`
+# that directory, e.g. `cd /usr/local/bin; curl https://onboardbase.github.io/secure-share-sh/ | sudo bash`
 #
 # Found a bug? Report it here: https://github.com/onboardbase/secure-share/issues
 #
