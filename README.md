@@ -2,7 +2,9 @@
 
 # Secure share [![Release](https://github.com/Onboardbase/secure-share/actions/workflows/release.yml/badge.svg)](https://github.com/Onboardbase/secure-share/actions/workflows/release.yml)[![Lint](https://github.com/Onboardbase/secure-share/actions/workflows/lint.yml/badge.svg)](https://github.com/Onboardbase/secure-share/actions/workflows/lint.yml)
 
-Share anything with teammates across machines via CLI. With Share, you can send something P2P, so you don't have to store whatever you want to share on somebody else's server. You don't have to set up a new server to transfer files to a teammate.
+Share anything with teammates across machines via CLI. Share is a tool for secure peer-to-peer connections, enabling direct communication and efficient exchange of secrets, files, and messages between machines with or without direct access to the internet. 
+
+With Share, you can send something P2P, so you don't have to store whatever you want to share on somebody else's server. You don't have to set up a new server to transfer files to a teammate.
 </div>
 
 # Contents
