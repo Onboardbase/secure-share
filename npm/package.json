@@ -1,6 +1,6 @@
 {
   "name": "@onboardbase/secure-share",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Share anything with teammates across machines via CLI",
   "scripts": {
     "test": "jest",
