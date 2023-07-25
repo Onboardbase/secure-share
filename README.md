@@ -1,8 +1,8 @@
 <div align="center">
 
-# Secure share [![Release](https://github.com/wokebuild/share/actions/workflows/release.yml/badge.svg)](https://github.com/wokebuild/share/actions/workflows/release.yml)[![Lint](https://github.com/wokebuild/share/actions/workflows/lint.yml/badge.svg)](https://github.com/wokebuild/share/actions/workflows/lint.yml)
+# Secure share [![Release](https://github.com/Onboardbase/secure-share/actions/workflows/release.yml/badge.svg)](https://github.com/Onboardbase/secure-share/actions/workflows/release.yml)[![Lint](https://github.com/Onboardbase/secure-share/actions/workflows/lint.yml/badge.svg)](https://github.com/Onboardbase/secure-share/actions/workflows/lint.yml)
 
-Share anything with teammates across machines via CLI
+Share anything with teammates across machines via CLI. With Share, you can send something P2P, so you don't have to store whatever you want to share on somebody else's server. You don't have to set up a new server to transfer files to a teammate.
 </div>
 
 # Contents
@@ -33,7 +33,7 @@ Or, using curl:
 curl https://wokebuild.github.io | bash
 ```
 Notes:
-- For windows users, please use `Git Bash` or any other CLI with the Bourne Shell.
+- For Windows users, please use `Git Bash` or any other CLI with the Bourne Shell.
 
 and then,
 ```shell
@@ -57,7 +57,7 @@ Options:
   -r, --remote-peer-id <REMOTE_PEER_ID>
           Peer ID of the remote to send secrets to
   -p, --port <PORT>
-          Port to establish connection on
+          Port to establish a connection on
   -d, --debug...
           Turn debugging information on
   -h, --help
@@ -113,12 +113,12 @@ The sender then attempts to send the secret, and if it is successful, `share` re
   All three items can also be sent together.
 
   ## Configuration
-  As of `v0.0.12`, `share` allows a configuration file to be passed. Ports, whitelists and items can all be configured directly instead of passing them as arguments. A sample configuration file can be found [here](./config.yml). For example:
+  As of `v0.0.12`, `share` allows a configuration file to be passed. Ports, whitelists, and items can all be configured directly instead of passing them as arguments. A sample configuration file can be found [here](./config.yml). For example:
 
   ```shell
   share receive -c ./config.yml
   ```
-  or for senders:
+  Or for senders:
 
   ```shell
   share send -r 12D3KooWLaLnHjKhQmB46jweVXCDKVy4AL58a4S4ZgHZGuJkzBf9 -c ./config.yml
@@ -129,7 +129,7 @@ The sender then attempts to send the secret, and if it is successful, `share` re
 
 Contributions of any kind are welcome! See the [contributing guide](contributing.md).
 
-[Thanks goes to these contributors](https://github.com/wokebuild/share/graphs/contributors)!
+[Thanks goes to these contributors](https://github.com/Onboardbase/secure-share/graphs/contributors)!
 
 # Roadmap
 
@@ -152,15 +152,15 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
 - [ ] Send via disposable tunnel links. Create a tunnel link from the secret, and send the URL to the receiver. Once the sharing is done, you can close the tunnel, and the URL becomes unavailable.
 - [ ] Curl command to an API endpoint without local download.
 - [ ] Personalize Peer ID + Allow saving recipient info (address, port, etc.) and giving a proper name so one can do "share send dante -m Hello"
-- [ ] Allow the possibility to always listen to certain addresses so that there can be a free flow of data
+- [ ] Allow the possibility to always listen to specific addresses so that there can be a free flow of data
 - [ ] Teams
 
 # License
 
-See [LICENSE](LICENSE) © [Woke](https://github.com/wokebuild/)
+See [LICENSE](LICENSE) © [Onboardbase](https://github.com/Onboardbase/)
 
 # Technicals
 
-The major technical detail `share` employs under the hood is P2P sharing. Below are great and detailed resources on P2P sharing and hole punching. Happy reading!!
+The major technical detail `share` employs under the hood is P2P sharing. Below are excellent and detailed resources on P2P sharing and hole punching. Happy reading!!
   - https://blog.ipfs.tech/2022-01-20-libp2p-hole-punching/
   - https://tailscale.com/blog/how-nat-traversal-works/
