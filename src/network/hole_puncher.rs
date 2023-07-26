@@ -3,11 +3,11 @@
 
 use std::process::exit;
 
-use crate::{
-    config::Config,
-    item::{Item, ItemResponse, ItemType, Status},
-    Mode,
-};
+use super::request_response_handler;
+use crate::handlers::security::{is_ip_blacklisted, is_ip_whitelisted};
+use crate::network::request::make_request;
+use crate::network::{get_behaviour, ConnectionDetails, Event};
+use crate::{config::Config, Mode};
 use anyhow::Result;
 use futures::{
     executor::{block_on, ThreadPool},
@@ -16,67 +16,15 @@ use futures::{
 };
 use libp2p::{
     core::{muxing::StreamMuxerBox, upgrade},
-    dcutr,
     dns::DnsConfig,
     identify, identity,
     multiaddr::Protocol,
-    noise, ping, relay,
-    swarm::{NetworkBehaviour, SwarmBuilder, SwarmEvent},
-    tcp, yamux, Multiaddr, PeerId, StreamProtocol, Transport,
+    noise, relay,
+    swarm::{SwarmBuilder, SwarmEvent},
+    tcp, yamux, Multiaddr, PeerId, Transport,
 };
 use rand::Rng;
-use request_response::{self, json, ProtocolSupport};
 use tracing::{debug, error, info, instrument};
-
-#[derive(NetworkBehaviour)]
-#[behaviour(to_swarm = "Event")]
-struct Behaviour {
-    relay_client: relay::client::Behaviour,
-    ping: ping::Behaviour,
-    identify: identify::Behaviour,
-    dcutr: dcutr::Behaviour,
-    request_response: json::Behaviour<Vec<Item>, ItemResponse>,
-}
-
-#[derive(Debug)]
-#[allow(clippy::large_enum_variant)]
-enum Event {
-    Ping(ping::Event),
-    Identify(identify::Event),
-    Relay(relay::client::Event),
-    Dcutr(dcutr::Event),
-    RequestResonse(request_response::Event<Vec<Item>, ItemResponse>),
-}
-
-impl From<ping::Event> for Event {
-    fn from(e: ping::Event) -> Self {
-        Event::Ping(e)
-    }
-}
-
-impl From<identify::Event> for Event {
-    fn from(e: identify::Event) -> Self {
-        Event::Identify(e)
-    }
-}
-
-impl From<relay::client::Event> for Event {
-    fn from(e: relay::client::Event) -> Self {
-        Event::Relay(e)
-    }
-}
-
-impl From<dcutr::Event> for Event {
-    fn from(e: dcutr::Event) -> Self {
-        Event::Dcutr(e)
-    }
-}
-
-impl From<request_response::Event<Vec<Item>, ItemResponse>> for Event {
-    fn from(e: request_response::Event<Vec<Item>, ItemResponse>) -> Self {
-        Event::RequestResonse(e)
-    }
-}
 
 #[instrument(level = "trace")]
 pub fn punch(mode: Mode, remote_peer_id: Option<PeerId>, config: Config) -> Result<()> {
@@ -109,22 +57,7 @@ pub fn punch(mode: Mode, remote_peer_id: Option<PeerId>, config: Config) -> Resu
             .boxed()
     };
 
-    let behaviour = Behaviour {
-        relay_client: client,
-        ping: ping::Behaviour::new(ping::Config::new()),
-        identify: identify::Behaviour::new(identify::Config::new(
-            "/SHARE/0.0.1".to_string(),
-            local_key.public(),
-        )),
-        dcutr: dcutr::Behaviour::new(local_peer_id),
-        request_response: json::Behaviour::<Vec<Item>, ItemResponse>::new(
-            [(
-                StreamProtocol::new("/share-json-protocol"),
-                ProtocolSupport::Full,
-            )],
-            request_response::Config::default(),
-        ),
-    };
+    let behaviour = get_behaviour(client, local_key, local_peer_id);
     let mut swarm = match ThreadPool::new() {
         Ok(tp) => SwarmBuilder::with_executor(transport, behaviour, local_peer_id, tp),
         Err(_) => SwarmBuilder::without_executor(transport, behaviour, local_peer_id),
@@ -207,7 +140,7 @@ pub fn punch(mode: Mode, remote_peer_id: Option<PeerId>, config: Config) -> Resu
                 .unwrap();
         }
     }
-
+    let mut connection_deets = ConnectionDetails::new();
     block_on(async {
         loop {
             match swarm.next().await.unwrap() {
@@ -227,9 +160,23 @@ pub fn punch(mode: Mode, remote_peer_id: Option<PeerId>, config: Config) -> Resu
                     debug!("DCUTR: {:?}", event)
                 }
                 SwarmEvent::Behaviour(Event::Identify(event)) => {
-                    debug!("IDENTIFY: {:?}", event)
+                    debug!("IDENTIFY: {:?}", event);
+                    let connection_id = connection_deets.id().unwrap();
+
+                    if is_ip_blacklisted(&event, &config) {
+                        // println!("deetttss {:#?}", connection_id);
+                        error!("This IP address is present in your blacklist.");
+                        swarm.close_connection(connection_id);
+                    }
+
+                    if !is_ip_whitelisted(&event, &config) {
+                        swarm.close_connection(connection_id);
+                    }
                 }
                 SwarmEvent::Behaviour(Event::Ping(_)) => {}
+                SwarmEvent::IncomingConnection { connection_id, .. } => {
+                    connection_deets.save_id(connection_id);
+                }
                 SwarmEvent::ConnectionEstablished {
                     peer_id, endpoint, ..
                 } => {
@@ -237,18 +184,7 @@ pub fn punch(mode: Mode, remote_peer_id: Option<PeerId>, config: Config) -> Resu
                     info!("Established connection to {peer_id} via {addr}");
 
                     //Send secrets to the receiver
-                    match mode {
-                        Mode::Send => {
-                            let items = get_items_to_be_sent(&config);
-
-                            info!("Sending {} items", items.len());
-                            swarm
-                                .behaviour_mut()
-                                .request_response
-                                .send_request(&peer_id, items);
-                        }
-                        Mode::Receive => {}
-                    }
+                    make_request(mode, &mut swarm, peer_id, &config);
                 }
                 SwarmEvent::OutgoingConnectionError {
                     peer_id: _, error, ..
@@ -257,57 +193,9 @@ pub fn punch(mode: Mode, remote_peer_id: Option<PeerId>, config: Config) -> Resu
                 }
                 SwarmEvent::Behaviour(Event::RequestResonse(
                     request_response::Event::Message { peer, message },
-                )) => match message {
-                    request_response::Message::Request {
-                        request_id: _,
-                        request,
-                        channel,
-                    } => {
-                        info!("Received {} items from {peer}", request.len());
-                        let mut items_saved_successfully: Vec<&Item> = vec![];
-                        let mut items_saved_fail: Vec<&Item> = vec![];
-
-                        request.iter().for_each(|item| match item.save(&config) {
-                            Ok(_) => {
-                                info!("Saved {:?} successfully", item.item_type(),);
-                                items_saved_successfully.push(item)
-                            }
-                            Err(err) => {
-                                error!(
-                                    "Failed to send {:?}: {}",
-                                    item.item_type(),
-                                    err.to_string()
-                                );
-                                items_saved_fail.push(item);
-                            }
-                        });
-
-                        let status = Status::Succes;
-
-                        //TODO handle error
-                        swarm
-                            .behaviour_mut()
-                            .request_response
-                            .send_response(
-                                channel,
-                                ItemResponse {
-                                    status,
-                                    no_of_fails: items_saved_fail.len(),
-                                    no_of_success: items_saved_successfully.len(),
-                                },
-                            )
-                            .unwrap();
-                    }
-                    request_response::Message::Response {
-                        request_id: _,
-                        response,
-                    } => {
-                        info!("Sent {} items successfully", response.no_of_success);
-                        if response.no_of_fails > 0 {
-                            error!("Failed to save {} items", response.no_of_fails);
-                        }
-                    }
-                },
+                )) => {
+                    request_response_handler(&mut swarm, message, peer, &config);
+                }
                 _ => {}
             }
         }
@@ -319,44 +207,4 @@ fn generate_ed25519(secret_key_seed: u8) -> identity::Keypair {
     bytes[0] = secret_key_seed;
 
     identity::Keypair::ed25519_from_bytes(bytes).expect("only errors on wrong length")
-}
-
-fn get_items_to_be_sent(opts: &Config) -> Vec<Item> {
-    if opts.file().is_none() && opts.secret().is_none() && opts.message().is_none() {
-        error!("Pass in a secret with the `-s` flag or a message with `-m` flag or a file path with the `f` flag");
-        exit(1);
-    }
-
-    let mut items = match &opts.secret() {
-        None => vec![],
-        Some(secrets) => secrets.iter().map(Item::from).collect::<Vec<_>>(),
-    };
-
-    let mut messages = {
-        match &opts.message() {
-            None => vec![],
-            Some(msgs) => msgs
-                .iter()
-                //I can unwrap safely because I don't expect any error
-                .map(|msg| Item::new(msg.clone(), ItemType::Message).unwrap())
-                .collect::<Vec<_>>(),
-        }
-    };
-    let mut files = match &opts.file() {
-        None => vec![],
-        Some(paths) => paths
-            .iter()
-            .map(|path| match Item::new(path.to_string(), ItemType::File) {
-                Err(err) => {
-                    error!("{}", err.to_string());
-                    exit(1);
-                }
-                Ok(res) => res,
-            })
-            .collect::<Vec<_>>(),
-    };
-
-    items.append(&mut messages);
-    items.append(&mut files);
-    items
 }

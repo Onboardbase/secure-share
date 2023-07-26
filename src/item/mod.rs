@@ -36,6 +36,7 @@ pub struct ItemResponse {
     pub status: Status,
     pub no_of_success: usize,
     pub no_of_fails: usize,
+    pub err: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

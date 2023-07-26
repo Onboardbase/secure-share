@@ -1,18 +1,20 @@
 use clap::Parser;
 use config::Config;
 use libp2p::PeerId;
+use network::punch;
 use std::{process::exit, str::FromStr};
 use tracing::error;
 
 mod config;
-mod hole_puncher;
+mod handlers;
 mod item;
 mod logger;
+mod network;
 
 #[derive(Parser, Debug)]
 #[command(name = "share")]
 #[command(author = "Onboardbase. <onboardbase.com>")]
-#[command(version = "0.0.16")]
+#[command(version = "0.0.17")]
 #[command(about = "Share anything with teammates across machines via CLI.", long_about = None)]
 pub struct Cli {
     /// Separated list of secrets to share. Key-Value pair is seperated by a comma. "my_key,my_value"
@@ -81,7 +83,7 @@ async fn main() {
     logger::log(&config).unwrap();
 
     let code = {
-        match hole_puncher::punch(mode, remote_peer_id, config) {
+        match punch(mode, remote_peer_id, config) {
             Ok(_) => 1,
             Err(err) => {
                 error!("{:#?}", err.to_string());

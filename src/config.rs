@@ -1,5 +1,7 @@
 use std::{
+    collections::HashSet,
     fs::{self, OpenOptions},
+    net::Ipv4Addr,
     path::{Path, PathBuf},
 };
 
@@ -17,6 +19,8 @@ pub struct Config {
     port: i32,
     debug: u8,
     save_path: PathBuf,
+    whitelists: Option<HashSet<Ipv4Addr>>,
+    blacklists: Option<HashSet<Ipv4Addr>>,
 }
 
 impl Config {
@@ -44,6 +48,8 @@ impl Config {
             port: opts.port.unwrap_or(0),
             debug: opts.debug,
             save_path: Config::create_default_path()?,
+            whitelists: None,
+            blacklists: None,
         };
         Ok(config)
     }
@@ -104,5 +110,13 @@ impl Config {
 
     pub fn save_path(&self) -> PathBuf {
         self.save_path.clone()
+    }
+
+    pub fn whitelists(&self) -> Option<HashSet<Ipv4Addr>> {
+        self.whitelists.clone()
+    }
+
+    pub fn blacklists(&self) -> Option<HashSet<Ipv4Addr>> {
+        self.blacklists.clone()
     }
 }

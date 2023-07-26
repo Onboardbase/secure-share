@@ -136,15 +136,16 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
 # Roadmap
 
 ### Utilities
-- [ ] Configuration File: Enables users to pass in a config file as an argument instead of listing all parameters manually.
+- [x] Configuration File: Enables users to pass in a config file as an argument instead of listing all parameters manually.
   - [x] Default path to save items(messgaes, secrets and files).
   - [x] Replace secrets or update them
   - [x] When files with the same name are received, discard, keep, inform, or update them
-  - [ ] Add a whitelist of IPs to allow connection from
+  - [x] Add a whitelist of IPs to allow connection from
 - [ ] Publish `share` to crates.io to enable users to `cargo install secure-share`
 ### Security
 - [ ] Signed Certificates from Let's Encrypt.
-- [ ] Whitelists and Blacklists
+- [x] TLS
+- [x] Whitelists and Blacklists
 
 ### Protocols
 - [ ] Support QUIC. Use QUIC as default and fall back to TCP
