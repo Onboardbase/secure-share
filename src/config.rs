@@ -120,3 +120,101 @@ impl Config {
         self.blacklists.clone()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::path::PathBuf;
+
+    use crate::item::Secret;
+
+    use super::Config;
+    use anyhow::{Ok, Result};
+    use assert_fs::prelude::FileWriteStr;
+
+    #[test]
+    fn default_path_created() -> Result<()> {
+        let path = Config::create_default_path()?;
+        assert!(path.exists());
+        Ok(())
+    }
+
+    fn make_config() -> Result<Config> {
+        let secret = vec![Secret::from("hi,there".to_string())];
+        let message = vec!["new message".to_string()];
+
+        let test_file = assert_fs::NamedTempFile::new("sample.txt")?;
+        test_file.write_str("A test\nActual content\nMore content\nAnother test")?;
+        let file = vec![test_file.path().to_str().unwrap().to_string()];
+
+        let config = Config {
+            secret: Some(secret),
+            message: Some(message),
+            file: Some(file),
+            port: 5555,
+            debug: 1,
+            save_path: PathBuf::from(test_file.parent().unwrap()),
+            whitelists: None,
+            blacklists: None,
+        };
+        Ok(config)
+    }
+
+    #[test]
+    fn file_to_be_sent() -> Result<()> {
+        let config = make_config();
+        assert!(config.is_ok());
+
+        let config = config?;
+        let files = config.file();
+        assert!(files.is_some());
+
+        let files = files.unwrap();
+        assert_eq!(files.len(), 1);
+
+        for file in files {
+            let path = PathBuf::from(file);
+            assert!(!path.exists());
+            // let content = fs::read_to_string(path)?;
+            // assert_eq!(content, "A test\nActual content\nMore content\nAnother test".to_string());
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn messages() -> Result<()> {
+        let config = make_config()?;
+        assert!(config.message().is_some());
+
+        let binding = config.message().unwrap();
+        let msg = binding.first().unwrap();
+        assert_eq!(msg, "new message");
+        Ok(())
+    }
+
+    #[test]
+    fn secrets() -> Result<()> {
+        let config = make_config()?;
+        assert!(config.secret().is_some());
+
+        let binding = config.secret().unwrap();
+        let secret = binding.first().unwrap();
+        assert_eq!(secret.key, "hi");
+        assert_ne!(secret.value, "hi");
+        Ok(())
+    }
+
+    #[test]
+    fn verbose() -> Result<()> {
+        let config = make_config()?;
+        assert!(config.verbose());
+        Ok(())
+    }
+
+    #[test]
+    fn lists() -> Result<()> {
+        let config = make_config()?;
+        assert_eq!(config.blacklists(), None);
+        assert_eq!(config.whitelists(), None);
+        Ok(())
+    }
+}

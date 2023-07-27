@@ -113,3 +113,113 @@ impl From<&Secret> for Item {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::config::Config;
+
+    use super::{Item, ItemType};
+    use anyhow::Result;
+    use assert_fs::prelude::{FileWriteStr, PathAssert, PathChild};
+    use predicates::prelude::*;
+
+    fn make_config(path: &str) -> Result<Config> {
+        let yaml_config = format!(
+            "
+            port: 5555 
+            save_path: '{path}'
+            secret:
+            - key: foo
+              value: bar
+            - key: baz
+              value: woo
+            message: 
+            - new message from me
+            - test message
+            debug: 1
+        "
+        );
+        let config: Config = serde_yaml::from_str(&yaml_config)?;
+
+        Ok(config)
+    }
+
+    #[test]
+    fn secret_item() -> Result<()> {
+        let item = Item::new("hi, there".to_string(), ItemType::Secret);
+        assert!(item.is_ok());
+
+        let item = item?;
+        assert_eq!(item.item_type(), ItemType::Secret);
+
+        let save_dir = assert_fs::TempDir::new()?;
+        let config = make_config(save_dir.path().to_str().unwrap())?;
+        item.save(&config)?;
+
+        save_dir
+            .child("messages.txt")
+            .assert(predicate::path::missing());
+
+        let secret_file = save_dir.child("secrets.json");
+        secret_file.assert(predicate::path::exists());
+
+        let secrets = r#"[{"key":"hi","value":" there"}]"#;
+        secret_file.assert(predicate::str::contains(secrets));
+
+        save_dir.close()?;
+        Ok(())
+    }
+
+    #[test]
+    fn message_item() -> Result<()> {
+        let item = Item::new(
+            "new message and another one too".to_string(),
+            ItemType::Message,
+        );
+        assert!(item.is_ok());
+
+        let item = item?;
+        assert_eq!(item.item_type(), ItemType::Message);
+
+        let save_dir = assert_fs::TempDir::new()?;
+        let config = make_config(save_dir.path().to_str().unwrap())?;
+        item.save(&config)?;
+
+        save_dir
+            .child("secrets.json")
+            .assert(predicate::path::missing());
+
+        let message_file = save_dir.child("messages.txt");
+        message_file.assert(predicate::path::exists());
+        message_file.assert(predicate::str::contains("new message and another one too"));
+
+        save_dir.close()?;
+        Ok(())
+    }
+
+    #[test]
+    fn file_item() -> Result<()> {
+        let test_file = assert_fs::NamedTempFile::new("sample.txt")?;
+        test_file.write_str("A test\nActual content\nMore content\nAnother test")?;
+
+        let item = Item::new(test_file.to_str().unwrap().to_string(), ItemType::File);
+        assert!(item.is_ok());
+
+        let item = item?;
+        assert_eq!(item.item_type(), ItemType::File);
+
+        let save_dir = assert_fs::TempDir::new()?;
+        let config = make_config(save_dir.path().to_str().unwrap())?;
+        item.save(&config)?;
+        test_file.close()?;
+
+        let saved_file = save_dir.child("sample.txt");
+        saved_file.assert(predicate::path::exists());
+        saved_file.assert(predicate::str::contains(
+            "A test\nActual content\nMore content\nAnother test",
+        ));
+
+        save_dir.close()?;
+        Ok(())
+    }
+}
