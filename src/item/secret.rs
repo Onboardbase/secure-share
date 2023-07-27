@@ -83,3 +83,44 @@ impl From<&String> for Secret {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::Secret;
+    use anyhow::Result;
+    use assert_fs::prelude::{PathAssert, PathChild};
+    use predicates::prelude::*;
+
+    #[test]
+    fn column_delimited_secret() -> Result<()> {
+        let secret = Secret::secret_from_string("hi:there".to_string());
+        assert!(secret.is_err());
+        let _ =
+            secret.map_err(|err| assert!(err.to_string().contains("Key or Value not found for")));
+        Ok(())
+    }
+
+    #[test]
+    fn secret() -> Result<()> {
+        let secret = Secret::from("hi,there".to_string());
+        assert_eq!(secret.key, "hi");
+        assert_eq!(secret.value, "there");
+        Ok(())
+    }
+
+    #[test]
+    fn save_secret() -> Result<()> {
+        let save_dir = assert_fs::TempDir::new()?;
+        let secret = Secret::from("foo,bar".to_string());
+        secret.save_secret(&save_dir.path())?;
+
+        let secret_file = save_dir.child("secrets.json");
+        secret_file.assert(predicate::path::exists());
+
+        let secrets = r#"[{"key":"foo","value":"bar"}]"#;
+        secret_file.assert(predicate::str::contains(secrets));
+
+        save_dir.close()?;
+        Ok(())
+    }
+}
