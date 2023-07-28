@@ -118,7 +118,7 @@ The sender then attempts to send the secret, and if it is successful, `share` re
   ## Configuration
   As of `v0.0.12`, `share` allows a configuration file to be passed. Ports, whitelists, and items can all be configured directly instead of passing them as arguments. A sample configuration file can be found [here](./config.yml). For example:
 
-```
+```yaml
 port: 5555 #An optional port defaults to 0 if not present
 # The folder path to store all items.
 # Secrets will be stored at <path>/secrets.json
@@ -152,7 +152,7 @@ whitelists
   share send -r 12D3KooWLaLnHjKhQmB46jweVXCDKVy4AL58a4S4ZgHZGuJkzBf9 -c ./config.yml
   ```
  ### Whitelists
- To enable whitelisting or blacklisting IP addresses, all you need to do is add them to config file.
+ To enable whitelisting or blacklisting IP addresses, you only need to add them to the config file.
 
 # Contributing
 
@@ -163,16 +163,9 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
 # Roadmap
 
 ### Utilities
-- [x] Configuration File: Enables users to pass in a config file as an argument instead of listing all parameters manually.
-  - [x] Default path to save items(messgaes, secrets and files).
-  - [x] Replace secrets or update them
-  - [x] When files with the same name are received, discard, keep, inform, or update them
-  - [x] Add a whitelist of IPs to allow connection from
 - [ ] Publish `share` to crates.io to enable users to `cargo install secure-share`
 ### Security
 - [ ] Signed Certificates from Let's Encrypt.
-- [x] TLS
-- [x] Whitelists and Blacklists
 
 ### Protocols
 - [ ] Support QUIC. Use QUIC as default and fall back to TCP
