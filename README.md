@@ -127,20 +127,20 @@ port: 5555 #An optional port defaults to 0 if not present
 ## If "default" is passed, the folder path will be `share`'s directory in the machine's local folder.
 save_path: "default"
 secret: #Optional during receive
-- key: foo
-value: bar
-- key: baz
-value: woo
+  - key: foo
+    value: bar
+  - key: baz
+    value: woo
 message: #Optional during receive
-- new message from me
-- test message
+  - new message from me
+  - test message
 file: #Optional during receive
-- "./dev_build.sh"
+  - "./dev_build.sh"
 debug: 1 #Compulsory. 0 is for off and 1 and above for on
 blacklists:
-- 34.138.139.178
+  - 34.138.139.178
 whitelists
-- 34.193.14.12
+  - 34.193.14.12
 ```
 
   ```shell
