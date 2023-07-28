@@ -4,7 +4,7 @@
 
 Share anything with teammates across machines via CLI. Share is a tool for secure peer-to-peer connections, enabling direct communication and efficient exchange of secrets, files, and messages between machines with or without direct access to the internet. 
 
-With Share, you can send something P2P, so you don't have to store whatever you want to share on somebody else's server. You don't have to set up a new server to transfer files to a teammate.
+<!-- With Share, you can send something P2P, so you don't have to store whatever you want to share on somebody else's server. You don't have to set up a new server to transfer files to a teammate. -->
 </div>
 
 # Contents
@@ -15,6 +15,7 @@ With Share, you can send something P2P, so you don't have to store whatever you 
   - [Files](#files)
   - [Messages](#messages)
   - [Configuration](#configuration)
+        - [Whitelists and Blacklists](#whitelists)
 - [Update](#update)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
@@ -117,6 +118,31 @@ The sender then attempts to send the secret, and if it is successful, `share` re
   ## Configuration
   As of `v0.0.12`, `share` allows a configuration file to be passed. Ports, whitelists, and items can all be configured directly instead of passing them as arguments. A sample configuration file can be found [here](./config.yml). For example:
 
+```
+port: 5555 #An optional port defaults to 0 if not present
+# The folder path to store all items.
+# Secrets will be stored at <path>/secrets.json
+# Messages at <path>/messages.txt
+# Files at <path>/nameoffile
+## If "default" is passed, the folder path will be `share`'s directory in the machine's local folder.
+save_path: "default"
+secret: #Optional during receive
+- key: foo
+value: bar
+- key: baz
+value: woo
+message: #Optional during receive
+- new message from me
+- test message
+file: #Optional during receive
+- "./dev_build.sh"
+debug: 1 #Compulsory. 0 is for off and 1 and above for on
+blacklists:
+- 34.138.139.178
+whitelists
+- 34.193.14.12
+```
+
   ```shell
   share receive -c ./config.yml
   ```
@@ -125,7 +151,8 @@ The sender then attempts to send the secret, and if it is successful, `share` re
   ```shell
   share send -r 12D3KooWLaLnHjKhQmB46jweVXCDKVy4AL58a4S4ZgHZGuJkzBf9 -c ./config.yml
   ```
-
+ ### Whitelists
+ To enable whitelisting or blacklisting IP addresses, all you need to do is add them to config file.
 
 # Contributing
 
