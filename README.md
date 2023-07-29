@@ -1,10 +1,10 @@
 <div align="center">
 
-# Secure share [![Release](https://github.com/Onboardbase/secure-share/actions/workflows/release.yml/badge.svg)](https://github.com/Onboardbase/secure-share/actions/workflows/release.yml)[![Lint](https://github.com/Onboardbase/secure-share/actions/workflows/lint.yml/badge.svg)](https://github.com/Onboardbase/secure-share/actions/workflows/lint.yml)
+# Secure share [![codecov](https://codecov.io/gh/Onboardbase/secure-share/branch/main/graph/badge.svg?token=H4CB88WT9I)](https://codecov.io/gh/Onboardbase/secure-share) [![Release](https://github.com/Onboardbase/secure-share/actions/workflows/release.yml/badge.svg)](https://github.com/Onboardbase/secure-share/actions/workflows/release.yml)[![Lint](https://github.com/Onboardbase/secure-share/actions/workflows/lint.yml/badge.svg)](https://github.com/Onboardbase/secure-share/actions/workflows/lint.yml)
 
 Share anything with teammates across machines via CLI. Share is a tool for secure peer-to-peer connections, enabling direct communication and efficient exchange of secrets, files, and messages between machines with or without direct access to the internet. 
 
-With Share, you can send something P2P, so you don't have to store whatever you want to share on somebody else's server. You don't have to set up a new server to transfer files to a teammate.
+<!-- With Share, you can send something P2P, so you don't have to store whatever you want to share on somebody else's server. You don't have to set up a new server to transfer files to a teammate. -->
 </div>
 
 # Contents
@@ -15,6 +15,7 @@ With Share, you can send something P2P, so you don't have to store whatever you 
   - [Files](#files)
   - [Messages](#messages)
   - [Configuration](#configuration)
+        - [Whitelists and Blacklists](#whitelists)
 - [Update](#update)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
@@ -117,6 +118,31 @@ The sender then attempts to send the secret, and if it is successful, `share` re
   ## Configuration
   As of `v0.0.12`, `share` allows a configuration file to be passed. Ports, whitelists, and items can all be configured directly instead of passing them as arguments. A sample configuration file can be found [here](./config.yml). For example:
 
+```yaml
+port: 5555 #An optional port defaults to 0 if not present
+# The folder path to store all items.
+# Secrets will be stored at <path>/secrets.json
+# Messages at <path>/messages.txt
+# Files at <path>/nameoffile
+## If "default" is passed, the folder path will be `share`'s directory in the machine's local folder.
+save_path: "default"
+secret: #Optional during receive
+  - key: foo
+    value: bar
+  - key: baz
+    value: woo
+message: #Optional during receive
+  - new message from me
+  - test message
+file: #Optional during receive
+  - "./dev_build.sh"
+debug: 1 #Compulsory. 0 is for off and 1 and above for on
+blacklists:
+  - 34.138.139.178
+whitelists
+  - 34.193.14.12
+```
+
   ```shell
   share receive -c ./config.yml
   ```
@@ -125,7 +151,8 @@ The sender then attempts to send the secret, and if it is successful, `share` re
   ```shell
   share send -r 12D3KooWLaLnHjKhQmB46jweVXCDKVy4AL58a4S4ZgHZGuJkzBf9 -c ./config.yml
   ```
-
+ ### Whitelists
+ To enable whitelisting or blacklisting IP addresses, you only need to add them to the config file.
 
 # Contributing
 
@@ -136,26 +163,20 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
 # Roadmap
 
 ### Utilities
-- [x] Configuration File: Enables users to pass in a config file as an argument instead of listing all parameters manually.
-  - [x] Default path to save items(messgaes, secrets and files).
-  - [x] Replace secrets or update them
-  - [x] When files with the same name are received, discard, keep, inform, or update them
-  - [x] Add a whitelist of IPs to allow connection from
-- [ ] Publish `share` to crates.io to enable users to `cargo install secure-share`
+- [ ] Publish `share` to crates.io to enable users to `cargo install secure-share`.
+- [ ] Send via disposable tunnel links. Create a tunnel link from the secret, and send the URL to the receiver. Once the sharing is done, you can close the tunnel, and the URL becomes unavailable.
+- [ ] Curl command to an API endpoint without local download.
+- [ ] Personalize peer ID + allow saving recipient info (address, port, etc.) and giving a proper name so one can do "share send dante -m Hello"
+- [ ] Allow the possibility to always listen to specific addresses so that there can be a free flow of data.
+
 ### Security
 - [ ] Signed Certificates from Let's Encrypt.
-- [x] TLS
-- [x] Whitelists and Blacklists
 
 ### Protocols
 - [ ] Support QUIC. Use QUIC as default and fall back to TCP
 - [ ] AutoNat: If you look closely, `share` assumes both peers are behind NATs, firewalls, or proxies. But sometimes, this might not be the case, and it is excessive to hole punch just for that. Implementing `AutoNat` will first check if the two peers can communicate directly. If not, it will then proceed to hole punch. With TCP, this might take about 3 to 10 seconds, and this is where QUIC comes in and improves upon `share`'s speed.
 
 ### Miscellaneous
-- [ ] Send via disposable tunnel links. Create a tunnel link from the secret, and send the URL to the receiver. Once the sharing is done, you can close the tunnel, and the URL becomes unavailable.
-- [ ] Curl command to an API endpoint without local download.
-- [ ] Personalize Peer ID + Allow saving recipient info (address, port, etc.) and giving a proper name so one can do "share send dante -m Hello"
-- [ ] Allow the possibility to always listen to specific addresses so that there can be a free flow of data
 - [ ] Teams
 
 # License
