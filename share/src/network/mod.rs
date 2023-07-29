@@ -148,3 +148,40 @@ fn request_response_handler(
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use libp2p::{identity, relay, swarm::ConnectionId, PeerId};
+
+    use super::{get_behaviour, ConnectionDetails};
+
+    #[test]
+    fn new_connection_details() {
+        let details = ConnectionDetails::new();
+        assert_eq!(details.connection_id, None)
+    }
+
+    #[test]
+    fn connection_id() {
+        let mut details = ConnectionDetails::new();
+        let id = ConnectionId::new_unchecked(0);
+        details.save_id(id);
+        assert_eq!(details.id(), Some(id));
+    }
+
+    fn generate_ed25519() -> identity::Keypair {
+        let mut bytes = [0u8; 32];
+        bytes[0] = 2;
+
+        identity::Keypair::ed25519_from_bytes(bytes).expect("only errors on wrong length")
+    }
+
+    #[test]
+    fn hole_puncher_behaviour() {
+        let local_key = generate_ed25519();
+        let peer_id = PeerId::random();
+        let (_, relay_client) = relay::client::new(peer_id);
+        let behaviour = get_behaviour(relay_client, local_key, peer_id);
+        assert!(!behaviour.request_response.is_connected(&peer_id));
+    }
+}
