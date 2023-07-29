@@ -160,6 +160,38 @@ mod tests {
     }
 
     #[test]
+    fn config_file() -> Result<()> {
+        let yaml_config = format!(
+            "
+            port: 5555 
+            save_path: 'default'
+            secret:
+            - key: foo
+              value: bar
+            - key: baz
+              value: woo
+            message: 
+            - new message from me
+            - test message
+            debug: 1
+        "
+        );
+        let file = assert_fs::NamedTempFile::new("config.yml")?;
+        file.write_str(&yaml_config)?;
+        let config = Config::from_config_file(file.path().to_str().unwrap().to_string())?;
+        assert_eq!(config.port(), 5555);
+        let project_dir =
+            directories_next::ProjectDirs::from("com", "onboardbase", "secureshare").unwrap();
+        let path = project_dir.data_local_dir();
+
+        assert!(path.exists());
+        assert_eq!(config.save_path(), PathBuf::from(path));
+
+        file.close()?;
+        Ok(())
+    }
+
+    #[test]
     fn file_to_be_sent() -> Result<()> {
         let config = make_config();
         assert!(config.is_ok());
