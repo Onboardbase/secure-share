@@ -90,7 +90,7 @@ INFO  Listening on "/ip4/157.245.40.97/tcp/4001/p2p/12D3KooWDpJ7As7BWAwRMfu1VU2W
 #### The sender:
 Obtain the `PeerId` of the teammate you wish to send a secret to, then:
 ```shell
-share send -r 12D3KooWA768LzHMatxkjD1f9DrYW375GZJr6MHPCNEdDtHeTNRt -s "hello, woke"
+share send -r 12D3KooWA768LzHMatxkjD1f9DrYW375GZJr6MHPCNEdDtHeTNRt -s "hello, world"
 ```
 `share` will print your IP address and your `PeerId`.
 To verify that a connection was established and your machine can talk to your teammates, you should see a similar thing below in your terminal:
@@ -154,7 +154,7 @@ whitelists:
  ### Whitelists/Blacklists IP addresses
  Whitelisting and blacklisting allow or prevents traffic from specified IPs. You only need to add the list of IPs to the config file to enable it.
  If no whitelist IPs are specified, all connections are allowed. If whitelist IPs are specified, traffic is only allowed from those addresses.
- Generic IPs like `127.0.0.1` or `192.0.0.0` won't work as they represent localhost, and the firewall access points respectively.
+ Generic IPs like `127.0.0.1` or `192.0.0.0` won't work as they represent localhost and firewall access points, respectively.
 
 # Contributing
 
@@ -168,7 +168,6 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
 - [ ] Publish `share` to crates.io to enable users to `cargo install secure-share`.
 - [ ] Send via disposable tunnel links.
 - [ ] Personalize peer ID + allow saving recipient info (address, port, etc.) and giving a proper name so one can do "share send dante -m Hello"
-- [ ] Allow the possibility to always listen to specific addresses to have a free flow of data.
 
 ### Security
 - [ ] Signed Certificates from Let's Encrypt.
