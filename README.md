@@ -136,7 +136,7 @@ message: #Optional during receive
   - test message
 file: #Optional during receive
   - "./dev_build.sh"
-debug: 1 #Compulsory. 0 is for off and 1 and above for on
+debug: 1 #Compulsory. 0 is for off, and 1 and above for on
 blacklists:
   - 34.138.139.178
 whitelists:
@@ -152,9 +152,7 @@ whitelists:
   share send -r 12D3KooWLaLnHjKhQmB46jweVXCDKVy4AL58a4S4ZgHZGuJkzBf9 -c ./config.yml
   ```
  ### Whitelists/Blacklists IP addresses
- Whitelisting and blacklisting allow or prevents traffic from specified IPs. You only need to add the list of IPs to the config file to enable it.
- If no whitelist IPs are specified, all connections are allowed. If whitelist IPs are specified, traffic is only allowed from those addresses.
- Generic IPs like `127.0.0.1` or `192.0.0.0` won't work as they represent localhost and firewall access points, respectively.
+ Whitelisting and blacklisting control traffic from specified IPs. To enable this feature, add the IP list to the config file. If no whitelist IPs are provided, all connections are allowed. However, if whitelist IPs are specified, only traffic from those addresses is permitted. Generic IPs like 127.0.0.1 (localhost) or 192.0.0.0 (firewall access points) won't work.
 
 # Contributing
 
