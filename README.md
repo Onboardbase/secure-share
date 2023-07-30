@@ -151,8 +151,10 @@ whitelists:
   ```shell
   share send -r 12D3KooWLaLnHjKhQmB46jweVXCDKVy4AL58a4S4ZgHZGuJkzBf9 -c ./config.yml
   ```
- ### Whitelists/Blacklists
- To enable whitelisting or blacklisting IP addresses, you only need to add them to the config file.
+ ### Whitelists/Blacklists IP addresses
+ Whitelisting and blacklisting allow or prevents traffic from specified IPs. You only need to add the list of IPs to the config file to enable it.
+ If no whitelist IPs are specified, all connections are allowed. If whitelist IPs are specified, traffic is only allowed from those addresses.
+ Generic IPs like `127.0.0.1` or `192.0.0.0` won't work as they represent localhost, and the firewall access points respectively.
 
 # Contributing
 
