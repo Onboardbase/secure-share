@@ -175,7 +175,7 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
 
 ### Miscellaneous
 - [ ] Send via disposable tunnel links + curl command to an API endpoint without local download (a way to "curl" on the consumer side so I can send them a link)
-- [ ] Teams
+- [ ] Enterprise
 
 # License
 
