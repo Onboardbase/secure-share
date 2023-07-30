@@ -139,7 +139,7 @@ file: #Optional during receive
 debug: 1 #Compulsory. 0 is for off and 1 and above for on
 blacklists:
   - 34.138.139.178
-whitelists
+whitelists:
   - 34.193.14.12
 ```
 
@@ -151,7 +151,7 @@ whitelists
   ```shell
   share send -r 12D3KooWLaLnHjKhQmB46jweVXCDKVy4AL58a4S4ZgHZGuJkzBf9 -c ./config.yml
   ```
- ### Whitelists
+ ### Whitelists/Blacklists
  To enable whitelisting or blacklisting IP addresses, you only need to add them to the config file.
 
 # Contributing
