@@ -41,7 +41,7 @@ curl https://onboardbase.github.io/secure-share-sh/ | bash
 ```
 Notes:
 - For Windows users, please use `Git Bash` or any other CLI with the Bourne Shell.
-- For users with Rust on their machines, ensure that `$HOME/.cargo/bin` directory is in your `$PATH` if you installed Rust with `rustup`. If not, please find the correspondng directory and add it to your `$PATH`.
+- For users with Rust on their machines, ensure that `$HOME/.cargo/bin` directory is in your `$PATH` if you installed Rust with `rustup`. If not, please find the corresponding directory and add it to your `$PATH`.
 and then,
 ```shell
 scs --help
@@ -75,7 +75,7 @@ Options:
 
 
 ## Usage
-`scs` enables the transmission of secrets or messages between teammates using different machines and behind different networks. To share a secret, the sender and receiver must both get `scs` as described above and follow the instructions below.
+`scs` enables the transmission of secrets or messages between teammates using different machines and behind different networks. To share a secret, the sender and receiver must get `scs` as described above and follow the instructions below.
 
 #### The receiver:
 Open a terminal or `cd` to where `scs` was installed, then:
@@ -94,7 +94,7 @@ INFO  Listening on "/ip4/157.245.40.97/tcp/4001/p2p/12D3KooWDpJ7As7BWAwRMfu1VU2W
 #### The sender:
 Obtain the `PeerId` of the teammate you wish to send a secret to, then:
 ```shell
-scs send -r 12D3KooWA768LzHMatxkjD1f9DrYW375GZJr6MHPCNEdDtHeTNRt -s "hello, woke"
+scs send -r 12D3KooWA768LzHMatxkjD1f9DrYW375GZJr6MHPCNEdDtHeTNRt -s "hello, world"
 ```
 `scs` will print your IP address and your `PeerId`.
 To verify that a connection was established and your machine can talk to your teammates, you should see a similar thing below in your terminal:
@@ -167,11 +167,8 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
 # Roadmap
 
 ### Utilities
-- [x] Publish `scs` to crates.io to enable users to `cargo install scs`.
-- [ ] Send via disposable tunnel links. Create a tunnel link from the secret, and send the URL to the receiver. Once the sharing is done, you can close the tunnel, and the URL becomes unavailable.
-- [ ] Curl command to an API endpoint without local download.
 - [ ] Personalize peer ID + allow saving recipient info (address, port, etc.) and giving a proper name so one can do "scs send dante -m Hello"
-- [ ] Allow the possibility to always listen to specific addresses so that there can be a free flow of data.
+- [ ] Allow the possibility to always listen to specific addresses to have a free flow of data.
 
 
 ### Security
@@ -183,7 +180,6 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
 
 ### Miscellaneous
 - [ ] Send via disposable tunnel links + curl command to an API endpoint without local download (a way to "curl" on the consumer side so I can send them a link)
-- [ ] Enterprise
 
 # License
 
@@ -191,6 +187,6 @@ See [LICENSE](LICENSE) © [Onboardbase](https://github.com/Onboardbase/)
 
 # Technicals
 
-The major technical detail `scs` employs under the hood is P2P sharing. Below are excellent and detailed resources on P2P sharing and hole punching. Happy reading!!
+The significant technical detail `scs` employs under the hood is P2P sharing. Below are excellent and detailed resources on P2P sharing and hole punching. Happy reading!!
   - https://blog.ipfs.tech/2022-01-20-libp2p-hole-punching/
   - https://tailscale.com/blog/how-nat-traversal-works/
