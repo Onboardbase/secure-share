@@ -158,9 +158,10 @@ whitelists:
   ```
  ### Whitelists/Blacklists IP addresses
  Whitelisting and blacklisting control traffic from specified IPs. To enable this feature, add the IP list to the config file. If no whitelist IPs are provided, all connections are allowed. However, if whitelist IPs are specified, only traffic from those addresses is permitted. Generic IPs like 127.0.0.1 (localhost) or 192.0.0.0 (firewall access points) won't work.
- ### Signed Certificate
- Receivers can configure `scs` to only allow connections from users that are using a signed cerificate from the CA. Or from just self sogned certificates. 
- To do this, add a `connection: trusted` or `connection: self` to the configuration file.
+ 
+### Signed Certificate
+ Receivers can configure `scs` to only allow connections from users using a signed certificate from the CA. Or from just self-signed certificates. 
+ Add a `connection: trusted` or `connection: self` to the configuration file to do this.
 
 # Contributing
 
@@ -172,7 +173,7 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
 
 ### Utilities
 - [ ] Personalize peer ID + allow saving recipient info (address, port, etc.) and giving a proper name so one can do "scs send dante -m Hello"
-- [ ] Allow the possibility to always listen to specific addresses to have a free flow of data.
+- [ ] Allow the possibility to always listen to specific addresses for a free data flow.
 
 
 ### Security
