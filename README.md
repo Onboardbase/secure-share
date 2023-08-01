@@ -140,10 +140,10 @@ message: #Optional during receive
   - test message
 file: #Optional during receive
   - "./dev_build.sh"
-debug: 1 #Compulsory. 0 is for off and 1 and above for on
+debug: 1 #Compulsory. 0 is for off, and 1 and above for on
 blacklists:
   - 34.138.139.178
-whitelists
+whitelists:
   - 34.193.14.12
 ```
 
@@ -155,8 +155,8 @@ whitelists
   ```shell
   scs send -r 12D3KooWLaLnHjKhQmB46jweVXCDKVy4AL58a4S4ZgHZGuJkzBf9 -c ./config.yml
   ```
- ### Whitelists
- To enable whitelisting or blacklisting IP addresses, you only need to add them to the config file.
+ ### Whitelists/Blacklists IP addresses
+ Whitelisting and blacklisting control traffic from specified IPs. To enable this feature, add the IP list to the config file. If no whitelist IPs are provided, all connections are allowed. However, if whitelist IPs are specified, only traffic from those addresses is permitted. Generic IPs like 127.0.0.1 (localhost) or 192.0.0.0 (firewall access points) won't work.
 
 # Contributing
 
@@ -173,6 +173,7 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
 - [ ] Personalize peer ID + allow saving recipient info (address, port, etc.) and giving a proper name so one can do "scs send dante -m Hello"
 - [ ] Allow the possibility to always listen to specific addresses so that there can be a free flow of data.
 
+
 ### Security
 - [ ] Signed Certificates from Let's Encrypt.
 
@@ -181,7 +182,8 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
 - [ ] AutoNat: If you look closely, `scs` assumes both peers are behind NATs, firewalls, or proxies. But sometimes, this might not be the case, and it is excessive to hole punch just for that. Implementing `AutoNat` will first check if the two peers can communicate directly. If not, it will then proceed to hole punch. With TCP, this might take about 3 to 10 seconds, and this is where QUIC comes in and improves upon `scs`'s speed.
 
 ### Miscellaneous
-- [ ] Teams
+- [ ] Send via disposable tunnel links + curl command to an API endpoint without local download (a way to "curl" on the consumer side so I can send them a link)
+- [ ] Enterprise
 
 # License
 
