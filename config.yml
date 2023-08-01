@@ -3,7 +3,7 @@ port: 5555 #An optional port defaults to 0 if not present
 # Secrets will be stored at <path>/secrets.json
 # Messages at <path>/messages.txt
 # Files at <path>/nameoffile
-## If "default" is passed, the folder path will be `share`'s directory in the machine's local folder.
+## If "default" is passed, the folder path will be `scs`'s directory in the machine's local folder.
 save_path: "default"
 secret: #Optional during receive
 - key: foo

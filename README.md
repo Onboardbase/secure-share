@@ -27,9 +27,13 @@ Share anything with teammates across machines via CLI. Share is a tool for secur
 - `bash`, `curl`, `tar`: install these utilities.
 
 ## Install 
-To use `share`,
+To use `scs`,
 ```bash
 yarn add @onboardbase/secure-share # npm i @onboardbase/secure-share
+```
+Or, if you have rust on your machine:
+```bash
+cargo install scs
 ```
 Or, using curl:
 ```sh
@@ -37,19 +41,19 @@ curl https://onboardbase.github.io/secure-share-sh/ | bash
 ```
 Notes:
 - For Windows users, please use `Git Bash` or any other CLI with the Bourne Shell.
-
+- For users with Rust on their machines, ensure that `$HOME/.cargo/bin` directory is in your `$PATH` if you installed Rust with `rustup`. If not, please find the correspondng directory and add it to your `$PATH`.
 and then,
 ```shell
-share --help # ./share --help if you used the bash script
+scs --help
 ```
-You should get a response displaying the utilities for `share`
+You should get a response displaying the utilities for `scs`
 ```
 Share anything with teammates across machines via CLI.
 
-Usage: share [OPTIONS] <MODE>
+Usage: scs [OPTIONS] <MODE>
 
 Arguments:
-  <MODE>  The mode (send secrets, or receive secrets). e,g `share send` or `share receive`
+  <MODE>  The mode (send secrets, or receive secrets). e,g `scs send` or `scs receive`
 Options:
   -s, --secret <SECRET>
           Separated list of secrets to share. The key-Value pair is separated by a comma. "my_key,my_value"
@@ -71,14 +75,14 @@ Options:
 
 
 ## Usage
-`share` enables the transmission of secrets or messages between teammates using different machines and behind different networks. To share a secret, the sender and receiver must both get `share` as described above and follow the instructions below.
+`scs` enables the transmission of secrets or messages between teammates using different machines and behind different networks. To share a secret, the sender and receiver must both get `scs` as described above and follow the instructions below.
 
 #### The receiver:
-Open a terminal or `cd` to where `share` was installed, then:
+Open a terminal or `cd` to where `scs` was installed, then:
 ```shell
-share receive
+scs receive
 ```
-`share` starts in listen mode and assigns you a `PeerId`, and picks a random port to start on. (An optional `-p` flag is available to specify a port). A response like the one below should be displayed:
+`scs` starts in listen mode and assigns you a `PeerId`, and picks a random port to start on. (An optional `-p` flag is available to specify a port). A response like the one below should be displayed:
 ```
 INFO  Your PeerId is: 12D3KooWA768LzHMatxkjD1f9DrYW375GZJr6MHPCNEdDtHeTNRt
 INFO  Listening on "/ip4/172.19.192.1/tcp/54654"
@@ -90,9 +94,9 @@ INFO  Listening on "/ip4/157.245.40.97/tcp/4001/p2p/12D3KooWDpJ7As7BWAwRMfu1VU2W
 #### The sender:
 Obtain the `PeerId` of the teammate you wish to send a secret to, then:
 ```shell
-share send -r 12D3KooWA768LzHMatxkjD1f9DrYW375GZJr6MHPCNEdDtHeTNRt -s "hello, world"
+scs send -r 12D3KooWA768LzHMatxkjD1f9DrYW375GZJr6MHPCNEdDtHeTNRt -s "hello, woke"
 ```
-`share` will print your IP address and your `PeerId`.
+`scs` will print your IP address and your `PeerId`.
 To verify that a connection was established and your machine can talk to your teammates, you should see a similar thing below in your terminal:
 ```
 INFO  Your PeerId is: 12D3KooWRpqX3QUvPNHXW5utkceLbx2b1LKfuAKa3iLdXXBGB2bY
@@ -101,22 +105,22 @@ INFO  Listening on "/ip4/192.168.212.254/tcp/40479"
 INFO  Established connection to 12D3KooWA768LzHMatxkjD1f9DrYW375GZJr6MHPCNEdDtHeTNRt via /ip4/157.245.40.97/tcp/4001/p2p/12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN/p2p-circuit/p2p/12D3KooWA768LzHMatxkjD1f9DrYW375GZJr6MHPCNEdDtHeTNRt
 ```
 
-The sender then attempts to send the secret, and if it is successful, `share` relays  messages to both parties, notifying them of the status and the progress of the secret sharing session.
+The sender then attempts to send the secret, and if it is successful, `scs` relays  messages to both parties, notifying them of the status and the progress of the secret sharing session.
 
   ## Files
-  `share` also supports sending files:
+  `scs` also supports sending files:
   ```shell
-  share send -r 12D3KooWLaLnHjKhQmB46jweVXCDKVy4AL58a4S4ZgHZGuJkzBf9 -f ../path/to/file1 -f path/to/file2
+  scs send -r 12D3KooWLaLnHjKhQmB46jweVXCDKVy4AL58a4S4ZgHZGuJkzBf9 -f ../path/to/file1 -f path/to/file2
   ```
   ## Messages
   Ordinary messages can also be shared
   ```shell
-  share send -r 12D3KooWLaLnHjKhQmB46jweVXCDKVy4AL58a4S4ZgHZGuJkzBf9 -m "hi there" -m "foo"
+  scs send -r 12D3KooWLaLnHjKhQmB46jweVXCDKVy4AL58a4S4ZgHZGuJkzBf9 -m "hi there" -m "foo"
   ```
   All three items can also be sent together.
 
   ## Configuration
-  As of `v0.0.12`, `share` allows a configuration file to be passed. Ports, whitelists, and items can all be configured directly instead of passing them as arguments. A sample configuration file can be found [here](./config.yml). For example:
+  As of `v0.0.12`, `scs` allows a configuration file to be passed. Ports, whitelists, and items can all be configured directly instead of passing them as arguments. A sample configuration file can be found [here](./config.yml). For example:
 
 ```yaml
 port: 5555 #An optional port defaults to 0 if not present
@@ -124,7 +128,7 @@ port: 5555 #An optional port defaults to 0 if not present
 # Secrets will be stored at <path>/secrets.json
 # Messages at <path>/messages.txt
 # Files at <path>/nameoffile
-## If "default" is passed, the folder path will be `share`'s directory in the machine's local folder.
+## If "default" is passed, the folder path will be `scs`'s directory in the machine's local folder.
 save_path: "default"
 secret: #Optional during receive
   - key: foo
@@ -144,12 +148,12 @@ whitelists:
 ```
 
   ```shell
-  share receive -c ./config.yml
+  scs receive -c ./config.yml
   ```
   Or for senders:
 
   ```shell
-  share send -r 12D3KooWLaLnHjKhQmB46jweVXCDKVy4AL58a4S4ZgHZGuJkzBf9 -c ./config.yml
+  scs send -r 12D3KooWLaLnHjKhQmB46jweVXCDKVy4AL58a4S4ZgHZGuJkzBf9 -c ./config.yml
   ```
  ### Whitelists/Blacklists IP addresses
  Whitelisting and blacklisting control traffic from specified IPs. To enable this feature, add the IP list to the config file. If no whitelist IPs are provided, all connections are allowed. However, if whitelist IPs are specified, only traffic from those addresses is permitted. Generic IPs like 127.0.0.1 (localhost) or 192.0.0.0 (firewall access points) won't work.
@@ -163,15 +167,19 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
 # Roadmap
 
 ### Utilities
-- [ ] Publish `share` to crates.io to enable users to `cargo install secure-share`.
-- [ ] Personalize peer ID + allow saving recipient info (address, port, etc.) and giving a proper name so one can do "share send dante -m Hello"
+- [x] Publish `scs` to crates.io to enable users to `cargo install scs`.
+- [ ] Send via disposable tunnel links. Create a tunnel link from the secret, and send the URL to the receiver. Once the sharing is done, you can close the tunnel, and the URL becomes unavailable.
+- [ ] Curl command to an API endpoint without local download.
+- [ ] Personalize peer ID + allow saving recipient info (address, port, etc.) and giving a proper name so one can do "scs send dante -m Hello"
+- [ ] Allow the possibility to always listen to specific addresses so that there can be a free flow of data.
+
 
 ### Security
 - [ ] Signed Certificates from Let's Encrypt.
 
 ### Protocols
 - [ ] Support QUIC. Use QUIC as default and fall back to TCP
-- [ ] AutoNat: If you look closely, `share` assumes both peers are behind NATs, firewalls, or proxies. But sometimes, this might not be the case, and it is excessive to hole punch just for that. Implementing `AutoNat` will first check if the two peers can communicate directly. If not, it will then proceed to hole punch. With TCP, this might take about 3 to 10 seconds, and this is where QUIC comes in and improves upon `share`'s speed.
+- [ ] AutoNat: If you look closely, `scs` assumes both peers are behind NATs, firewalls, or proxies. But sometimes, this might not be the case, and it is excessive to hole punch just for that. Implementing `AutoNat` will first check if the two peers can communicate directly. If not, it will then proceed to hole punch. With TCP, this might take about 3 to 10 seconds, and this is where QUIC comes in and improves upon `scs`'s speed.
 
 ### Miscellaneous
 - [ ] Send via disposable tunnel links + curl command to an API endpoint without local download (a way to "curl" on the consumer side so I can send them a link)
@@ -183,6 +191,6 @@ See [LICENSE](LICENSE) © [Onboardbase](https://github.com/Onboardbase/)
 
 # Technicals
 
-The major technical detail `share` employs under the hood is P2P sharing. Below are excellent and detailed resources on P2P sharing and hole punching. Happy reading!!
+The major technical detail `scs` employs under the hood is P2P sharing. Below are excellent and detailed resources on P2P sharing and hole punching. Happy reading!!
   - https://blog.ipfs.tech/2022-01-20-libp2p-hole-punching/
   - https://tailscale.com/blog/how-nat-traversal-works/

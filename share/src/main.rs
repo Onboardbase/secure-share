@@ -12,9 +12,9 @@ mod logger;
 mod network;
 
 #[derive(Parser, Debug)]
-#[command(name = "share")]
+#[command(name = "scs")]
 #[command(author = "Onboardbase. <onboardbase.com>")]
-#[command(version = "0.0.17")]
+#[command(version = "0.1.0")]
 #[command(about = "Share anything with teammates across machines via CLI.", long_about = None)]
 pub struct Cli {
     /// Separated list of secrets to share. Key-Value pair is seperated by a comma. "my_key,my_value"
@@ -32,7 +32,7 @@ pub struct Cli {
     file: Option<Vec<String>>,
 
     /// The mode (send secrets, or receive secrets).
-    /// e,g `share send` or `share receive`
+    /// e,g `scs send` or `scs receive`
     mode: Mode,
 
     /// Peer ID of the remote to send secrets to.
@@ -47,7 +47,7 @@ pub struct Cli {
     #[arg(short, long, action = clap::ArgAction::Count)]
     debug: u8,
 
-    /// Configuration file for `share`
+    /// Configuration file for `scs`
     #[arg(short, long)]
     config: Option<String>,
 }

@@ -1,8 +1,16 @@
 [package]
-name = "share"
-version = "0.0.17"
+name = "scs"
+version = "0.1.0"
 edition = "2021"
-default-run = "share"
+default-run = "scs"
+description = "Open source p2p share for devs to share anything with teammates across machines securely."
+license = "Apache-2.0"
+homepage = "https://github.com/Onboardbase/secure-share"
+documentation = "https://github.com/Onboardbase/secure-share#secure-share--"
+repository = "https://github.com/Onboardbase/secure-share"
+keywords = ["p2p", "sharing", "security"]
+categories = ["development-tools"]
+readme = "../README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
