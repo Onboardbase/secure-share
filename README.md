@@ -15,7 +15,8 @@ Share anything with teammates across machines via CLI. Share is a tool for secur
   - [Files](#files)
   - [Messages](#messages)
   - [Configuration](#configuration)
-        - [Whitelists and Blacklists](#whitelists)
+    - [Whitelists](#whitelists)
+    - [Signed Certs](#SignedCertificate)
 - [Update](#update)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
@@ -157,6 +158,9 @@ whitelists:
   ```
  ### Whitelists/Blacklists IP addresses
  Whitelisting and blacklisting control traffic from specified IPs. To enable this feature, add the IP list to the config file. If no whitelist IPs are provided, all connections are allowed. However, if whitelist IPs are specified, only traffic from those addresses is permitted. Generic IPs like 127.0.0.1 (localhost) or 192.0.0.0 (firewall access points) won't work.
+ ### Signed Certificate
+ Receivers can configure `scs` to only allow connections from users that are using a signed cerificate from the CA. Or from just self sogned certificates. 
+ To do this, add a `connection: trusted` or `connection: self` to the configuration file.
 
 # Contributing
 
@@ -172,7 +176,7 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
 
 
 ### Security
-- [ ] Signed Certificates from Let's Encrypt.
+- [x] Signed Certificates from Let's Encrypt.
 
 ### Protocols
 - [ ] Support QUIC. Use QUIC as default and fall back to TCP
