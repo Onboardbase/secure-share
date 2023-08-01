@@ -8,9 +8,9 @@ on:
     - 'v[0-9]+.[0-9]+.[0-9]+'
 
 env:
-  BIN_NAME: share
+  BIN_NAME: scs
   PROJECT_NAME: secure-share
-  REPO_NAME: onboardbase/share
+  REPO_NAME: onboardbase/secure-share
 
 jobs:
   dist:

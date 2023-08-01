@@ -1,8 +1,8 @@
 [package]
-name = "share"
+name = "scs"
 version = "0.0.17"
 edition = "2021"
-default-run = "share"
+default-run = "scs"
 description = "Open source p2p share for devs to share anything with teammates across machines securely."
 license = "Apache-2.0"
 homepage = "https://github.com/Onboardbase/secure-share"

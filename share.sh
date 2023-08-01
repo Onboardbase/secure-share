@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# This script installs share.
+# This script installs scs.
 #
 # Quick install: `curl https://onboardbase.github.io/secure-share-sh/ | bash`
 #
@@ -23,6 +23,7 @@ githubLatestTag() {
 
 platform=''
 machine=$(uname -m)
+executable="scs"
 
 # Check the GETSHARE_PALTFORM is set
 if [ "${GETSHARE_PLATFORM:-x}" != "x" ]; then
@@ -87,17 +88,16 @@ printf "Downloading https://github.com/onboardbase/secure-share/releases/downloa
 curl -L "https://github.com/onboardbase/secure-share/releases/download/v$TAG/secure-share-v$TAG-$platform.$extension" > "share.$extension"
 
 case "$extension" in
-  "zip") unzip -j "share.$extension" -d "secure-share-v$TAG-$platform" ;;
-  "tar.gz") tar -xvzf "share.$extension" "secure-share-v$TAG-$platform/share" ;;
+  "zip") unzip -j "$executable.$extension" -d "secure-share-v$TAG-$platform" ;;
+  "tar.gz") tar -xvzf "$executable.$extension" "secure-share-v$TAG-$platform/share" ;;
 esac
 
-mv "secure-share-v$TAG-$platform/share" ./share
+mv "secure-share-v$TAG-$platform/$executable" ./$executable
 
-rm "share.$extension"
+rm "$executable.$extension"
 rm -rf "secure-share-v$TAG-$platform"
 
 ##Make share globally executable
-executable="share"
 
 # Check the operating system
 if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
@@ -138,7 +138,7 @@ fi
 rm -rf $executable
 
 cat <<-'EOM'
-Share has been downloaded and is now globally accessible.
+scs has been downloaded and is now globally accessible.
 You can run it with:
-share --help
+scs --help
 EOM

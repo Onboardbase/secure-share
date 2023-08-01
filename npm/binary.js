@@ -9,32 +9,32 @@ const error = msg => {
 };
 
 const { version } = require("./package.json");
-const name = "share";
+const name = "scs";
 
 const supportedPlatforms = [
   {
     TYPE: "Windows_NT",
     ARCHITECTURE: "x64",
     RUST_TARGET: "x86_64-windows",
-    BINARY_NAME: "share.exe"
+    BINARY_NAME: "scs.exe"
   },
   {
     TYPE: "Linux",
     ARCHITECTURE: "x64",
     RUST_TARGET: "x86_64-linux",
-    BINARY_NAME: "share"
+    BINARY_NAME: "scs"
   },
   {
     TYPE: "Darwin",
     ARCHITECTURE: "x64",
     RUST_TARGET: "x86_64-macos",
-    BINARY_NAME: "share"
+    BINARY_NAME: "scs"
   },
   {
     TYPE: "Darwin",
     ARCHITECTURE: "arm64",
     RUST_TARGET: "x86_64-macos",
-    BINARY_NAME: "share"
+    BINARY_NAME: "scs"
   }
 ];
 
