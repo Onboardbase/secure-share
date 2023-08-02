@@ -146,6 +146,7 @@ blacklists:
   - 34.138.139.178
 whitelists:
   - 34.193.14.12
+connection: trusted #or self
 ```
 
   ```shell
