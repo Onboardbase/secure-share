@@ -1,13 +1,13 @@
 {
   "name": "@onboardbase/secure-share",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Share anything with teammates across machines via CLI",
   "scripts": {
     "test": "jest",
     "postinstall": "node ./install.js"
   },
   "bin": {
-    "share": "run.js"
+    "scs": "run.js"
   },
   "repository": {
     "type": "git",

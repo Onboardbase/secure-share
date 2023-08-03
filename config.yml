@@ -16,6 +16,6 @@ message: #Optional during receive
 file: #Optional during receive
 - "./dev_build.sh"
 debug: 1 #Compulsory. 0 is for off and 1 and above for on
-blacklists:
-- 127.0.0.1
-- 34.138.139.178
+# blacklists:
+# - 127.0.0.1
+# - 34.138.139.178
