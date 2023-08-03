@@ -141,8 +141,8 @@ pub fn punch(mode: Mode, remote_peer_id: Option<PeerId>, config: Config) -> Resu
         }
     }
     let mut connection_deets = ConnectionDetails::new();
+
     block_on(async {
-        let mut validated_ip = false;
         loop {
             match swarm.next().await.unwrap() {
                 SwarmEvent::NewListenAddr { address, .. } => {
@@ -168,12 +168,14 @@ pub fn punch(mode: Mode, remote_peer_id: Option<PeerId>, config: Config) -> Resu
                         // println!("deetttss {:#?}", connection_id);
                         error!("This IP address is present in your blacklist.");
                         swarm.close_connection(connection_id);
+                        exit(1);
                     }
 
                     if !is_ip_whitelisted(&event, &config) {
+                        error!("This IP address is not present in your whitleist.");
                         swarm.close_connection(connection_id);
+                        exit(1);
                     }
-                    validated_ip = true;
                 }
                 SwarmEvent::Behaviour(Event::Ping(_)) => {}
                 SwarmEvent::IncomingConnection { connection_id, .. } => {
@@ -190,10 +192,8 @@ pub fn punch(mode: Mode, remote_peer_id: Option<PeerId>, config: Config) -> Resu
                     let addr = endpoint.get_remote_address();
                     info!("Established connection to {peer_id} via {addr}");
 
-                    if validated_ip {
-                        //Send secrets to the receiver
-                        make_request(mode, &mut swarm, peer_id, &config);
-                    }
+                    //Send secrets to the receiver
+                    make_request(mode, &mut swarm, peer_id, &config);
                 }
                 SwarmEvent::OutgoingConnectionError {
                     peer_id: _, error, ..
