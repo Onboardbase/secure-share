@@ -7,7 +7,7 @@
     "postinstall": "node ./install.js"
   },
   "bin": {
-    "share": "run.js"
+    "scs": "run.js"
   },
   "repository": {
     "type": "git",
