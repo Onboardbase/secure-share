@@ -15,7 +15,8 @@ Share anything with teammates across machines via CLI. Share is a tool for secur
   - [Files](#files)
   - [Messages](#messages)
   - [Configuration](#configuration)
-        - [Whitelists and Blacklists](#whitelists)
+    - [Whitelists](#whitelists)
+    - [Signed Certs](#SignedCertificate)
 - [Update](#update)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
@@ -145,6 +146,7 @@ blacklists:
   - 34.138.139.178
 whitelists:
   - 34.193.14.12
+connection: trusted #or self
 ```
 
   ```shell
@@ -157,6 +159,10 @@ whitelists:
   ```
  ### Whitelists/Blacklists IP addresses
  Whitelisting and blacklisting control traffic from specified IPs. To enable this feature, add the IP list to the config file. If no whitelist IPs are provided, all connections are allowed. However, if whitelist IPs are specified, only traffic from those addresses is permitted. Generic IPs like 127.0.0.1 (localhost) or 192.0.0.0 (firewall access points) won't work.
+ 
+### Signed Certificate
+ Receivers can configure `scs` to only allow connections from users using a signed certificate from the CA. or just self-signed certificates. 
+ Add a `connection: trusted` or `connection: self` to the configuration file.
 
 # Contributing
 
@@ -168,17 +174,13 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
 
 ### Utilities
 - [ ] Personalize peer ID + allow saving recipient info (address, port, etc.) and giving a proper name so one can do "scs send dante -m Hello"
-- [ ] Allow the possibility to always listen to specific addresses to have a free flow of data.
-
-
-### Security
-- [ ] Signed Certificates from Let's Encrypt.
+- [ ] Allow to always listen to specific addresses for an accessible data flow.
 
 ### Protocols
 - [ ] Support QUIC. Use QUIC as default and fall back to TCP
 - [ ] AutoNat: If you look closely, `scs` assumes both peers are behind NATs, firewalls, or proxies. But sometimes, this might not be the case, and it is excessive to hole punch just for that. Implementing `AutoNat` will first check if the two peers can communicate directly. If not, it will then proceed to hole punch. With TCP, this might take about 3 to 10 seconds, and this is where QUIC comes in and improves upon `scs`'s speed.
 
-### Miscellaneous
+### Misc
 - [ ] Send via disposable tunnel links + curl command to an API endpoint without local download (a way to "curl" on the consumer side so I can send them a link)
 
 # License
