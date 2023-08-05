@@ -137,6 +137,7 @@ mod tests {
             - new message from me
             - test message
             debug: 1
+            seed: make
         "
         );
         let config: Config = serde_yaml::from_str(&yaml_config)?;

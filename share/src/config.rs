@@ -7,6 +7,7 @@ use std::{
 
 use anyhow::{Context, Result};
 use libp2p::PeerId;
+use rand::{distributions::Alphanumeric, Rng};
 use serde::{Deserialize, Serialize};
 
 use crate::{item::Secret, Cli, Mode};
@@ -21,6 +22,7 @@ pub struct Config {
     save_path: PathBuf,
     whitelists: Option<HashSet<Ipv4Addr>>,
     blacklists: Option<HashSet<Ipv4Addr>>,
+    seed: String,
 }
 
 impl Config {
@@ -50,6 +52,11 @@ impl Config {
             save_path: Config::create_default_path()?,
             whitelists: None,
             blacklists: None,
+            seed: rand::thread_rng()
+                .sample_iter(&Alphanumeric)
+                .take(32)
+                .map(char::from)
+                .collect(),
         };
         Ok(config)
     }
@@ -119,6 +126,19 @@ impl Config {
     pub fn blacklists(&self) -> Option<HashSet<Ipv4Addr>> {
         self.blacklists.clone()
     }
+
+    fn pad_seed_key(&self, mut s: String) -> String {
+        while s.len() < 32 {
+            s.push(' ');
+        }
+        s.truncate(32);
+        s
+    }
+
+    pub fn seed_key(&self) -> String {
+        let seed = self.seed.clone();
+        self.pad_seed_key(seed)
+    }
 }
 
 #[cfg(test)]
@@ -155,6 +175,7 @@ mod tests {
             save_path: PathBuf::from(test_file.parent().unwrap()),
             whitelists: None,
             blacklists: None,
+            seed: "test".to_string(),
         };
         Ok(config)
     }
@@ -174,6 +195,7 @@ mod tests {
             - new message from me
             - test message
             debug: 1
+            seed: test
         "
         );
         let file = assert_fs::NamedTempFile::new("config.yml")?;

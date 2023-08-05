@@ -23,7 +23,6 @@ use libp2p::{
     swarm::{SwarmBuilder, SwarmEvent},
     tcp, yamux, Multiaddr, PeerId, Transport,
 };
-use rand::Rng;
 use tracing::{debug, error, info, instrument};
 
 #[instrument(level = "trace")]
@@ -33,7 +32,7 @@ pub fn punch(mode: Mode, remote_peer_id: Option<PeerId>, config: Config) -> Resu
             .to_string()
             .parse()
             .unwrap();
-    let secret_key_seed = rand::thread_rng().gen_range(0..100);
+    let secret_key_seed = config.seed_key();
     let port = config.port();
 
     let local_key = generate_ed25519(secret_key_seed);
@@ -211,9 +210,8 @@ pub fn punch(mode: Mode, remote_peer_id: Option<PeerId>, config: Config) -> Resu
     })
 }
 
-fn generate_ed25519(secret_key_seed: u8) -> identity::Keypair {
-    let mut bytes = [0u8; 32];
-    bytes[0] = secret_key_seed;
-
+fn generate_ed25519(mut secret_key_seed: String) -> identity::Keypair {
+    let bytes = unsafe { secret_key_seed.as_bytes_mut() };
+    println!("{}", bytes.len());
     identity::Keypair::ed25519_from_bytes(bytes).expect("only errors on wrong length")
 }
