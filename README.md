@@ -15,8 +15,9 @@ Share anything with teammates across machines via CLI. Share is a tool for secur
   - [Files](#files)
   - [Messages](#messages)
   - [Configuration](#configuration)
-    - [Whitelists](#whitelists)
-    - [Signed Certs](#SignedCertificate)
+    - [Whitelists](#whitelistsblacklists-ip-addresses)
+    - [Signed Certs](#signed-certificate)
+    - [Seed Key](#seeds-seed-key)
 - [Update](#update)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
@@ -125,28 +126,24 @@ The sender then attempts to send the secret, and if it is successful, `scs` rela
 
 ```yaml
 port: 5555 #An optional port defaults to 0 if not present
-# The folder path to store all items.
-# Secrets will be stored at <path>/secrets.json
-# Messages at <path>/messages.txt
-# Files at <path>/nameoffile
-## If "default" is passed, the folder path will be `scs`'s directory in the machine's local folder.
 save_path: "default"
-secret: #Optional during receive
+secret: # Optional during receive
   - key: foo
     value: bar
   - key: baz
     value: woo
-message: #Optional during receive
+message: # Optional during receive
   - new message from me
   - test message
-file: #Optional during receive
+file: # Optional during receive
   - "./dev_build.sh"
-debug: 1 #Compulsory. 0 is for off, and 1 and above for on
+debug: 1 # Compulsory. 0 is for off, and 1 and above for on
 blacklists:
   - 34.138.139.178
 whitelists:
   - 34.193.14.12
-connection: trusted #or self
+connection: trusted # or self
+seed: "scsiscool"
 ```
 
   ```shell
@@ -163,6 +160,10 @@ connection: trusted #or self
 ### Signed Certificate
  Receivers can configure `scs` to only allow connections from users using a signed certificate from the CA. or just self-signed certificates. 
  Add a `connection: trusted` or `connection: self` to the configuration file.
+
+ ### Seeds (Seed Key)
+ The backbone of `scs` is `PeerId`. A `PeerId` a randomly generated key whenever a session is started for both the receiver and the sender. As of `v0.1.3` of `scs`, `PeerId`s can now be deterministic, that is, a single `PeerId` can be used for life. To do this, you need to set what is called a "seed". The `PeerId` is generated with respect to this seed. As long as the seed key remains the same, the `PeerId` will remain the same. 
+ The "seed" key is a string of any length lesser than 32. But for ease and optimal configuration, we recommend 4 or 5 letter words as in the above configuration file.
 
 # Contributing
 
