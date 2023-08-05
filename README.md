@@ -174,7 +174,8 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
 # Roadmap
 
 ### Utilities
-- [ ] Personalize peer ID + allow saving recipient info (address, port, etc.) and giving a proper name so one can do "scs send dante -m Hello"
+- [x] Personalize peer ID.
+- [ ] Allow saving recipient info (address, port, etc.) and giving a proper name so one can do "scs send dante -m Hello"
 - [ ] Allow to always listen to specific addresses for an accessible data flow.
 
 ### Protocols
