@@ -208,6 +208,7 @@ mod tests {
 
         assert!(path.exists());
         assert_eq!(config.save_path(), PathBuf::from(path));
+        assert_eq!(config.seed.len(), 4);
 
         file.close()?;
         Ok(())
@@ -269,6 +270,47 @@ mod tests {
         let config = make_config()?;
         assert_eq!(config.blacklists(), None);
         assert_eq!(config.whitelists(), None);
+        Ok(())
+    }
+
+    #[test]
+    fn seed() -> Result<()> {
+        let seed_key = "greyhounds";
+
+        let yaml_config = format!(
+            "
+            port: 5555 
+            save_path: 'default'
+            secret:
+            - key: foo
+              value: bar
+            - key: baz
+              value: woo
+            message: 
+            - new message from me
+            - test message
+            debug: 1
+            seed: {seed_key}
+        "
+        );
+        let config: Config = serde_yaml::from_str(&yaml_config)?;
+
+        let padded_string = config.seed_key();
+        let padded_string = &padded_string[seed_key.len()..padded_string.len()];
+        assert_eq!(padded_string.len(), (32 - seed_key.len()));
+        Ok(())
+    }
+
+    #[test]
+    fn pad_string() -> Result<()> {
+        let s = "hi".to_string();
+        let config = make_config()?;
+        let padded_str = config.pad_seed_key(s.clone());
+
+        assert_eq!(padded_str.len(), 32);
+        assert_ne!(s, padded_str);
+        assert!(padded_str.contains(&s));
+
         Ok(())
     }
 }
