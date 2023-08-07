@@ -11,7 +11,7 @@ use time::OffsetDateTime;
 
 use super::Store;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ScsPeer {
     addrs: String,
     name: String,
@@ -113,5 +113,37 @@ impl ScsPeer {
         } else {
             Ok(Some(peers.first().unwrap().clone()))
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use anyhow::Result;
+    use libp2p::{Multiaddr, PeerId};
+
+    use super::ScsPeer;
+
+    #[test]
+    fn peer_from_tuple() -> Result<()> {
+        let peer_id = PeerId::random();
+        let addr: Multiaddr = "/ip4/127.0.0.0/tcp/5555".parse().unwrap();
+        let peer = ScsPeer::from((&addr, "foo".to_string(), peer_id));
+        assert_eq!(peer.peer_id()?, peer_id);
+        assert_eq!(peer.name().as_str(), "foo");
+        Ok(())
+    }
+
+    #[test]
+    fn wrong_peer_id() {
+        let peer = ScsPeer {
+            addrs: "/ip4/jki/oo/tcp/990".to_string(),
+            name: "foo".to_string(),
+            last_seen: "now".to_string(),
+            peer_id: "hi".to_string(),
+            id: Some(1),
+        };
+
+        let peer_id = peer.peer_id();
+        assert!(peer_id.is_err());
     }
 }

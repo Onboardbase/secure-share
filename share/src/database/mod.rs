@@ -1,5 +1,6 @@
 use std::{
     fs,
+    path::PathBuf,
     sync::{Arc, Mutex, MutexGuard},
 };
 
@@ -22,13 +23,20 @@ pub struct Store {
 }
 
 impl Store {
-    pub fn initialize() -> Result<Store> {
+    pub fn initialize(path: Option<PathBuf>) -> Result<Store> {
         debug!("Initializing Database Connection");
-        let dirs =
-            directories_next::ProjectDirs::from("com", "onboardbase", "secureshare").unwrap();
-        let path = dirs.data_local_dir();
-        fs::create_dir_all(path).context("Failed to create default directory")?;
-        let path = path.join("scs.db3");
+
+        let path = match path {
+            Some(path) => path,
+            None => {
+                let dirs = directories_next::ProjectDirs::from("com", "onboardbase", "secureshare")
+                    .unwrap();
+                let path = dirs.data_local_dir();
+                fs::create_dir_all(path).context("Failed to create default directory")?;
+                path.join("scs.db3")
+            }
+        };
+
         let conn = Connection::open(path)?;
 
         debug!("Preparing to execute schema");
@@ -97,14 +105,27 @@ impl Store {
 #[cfg(test)]
 mod tests {
     use anyhow::Result;
+    use libp2p::PeerId;
 
     use super::Store;
 
     #[test]
     fn initialize_db() -> Result<()> {
-        let settings = Store::initialize()?;
+        let settings = Store::initialize(None)?;
         let conn = settings.get_conn_handle();
         assert!(conn.is_autocommit());
+        Ok(())
+    }
+
+    #[test]
+    fn absent_peer() -> Result<()> {
+        let db_path = assert_fs::NamedTempFile::new("scs.db3")?;
+        let store = Store::initialize(Some(db_path.path().to_path_buf()))?;
+
+        let peer = store.is_peer_present(PeerId::random())?;
+        assert_eq!(peer, None);
+
+        db_path.close()?;
         Ok(())
     }
 }

@@ -191,16 +191,53 @@ impl Config {
 mod tests {
     use std::path::PathBuf;
 
-    use crate::item::Secret;
+    use crate::{database::Store, item::Secret, Cli, Mode};
 
     use super::Config;
     use anyhow::{Ok, Result};
     use assert_fs::prelude::FileWriteStr;
+    use libp2p::PeerId;
 
     #[test]
     fn default_path_created() -> Result<()> {
         let path = Config::create_default_path()?;
         assert!(path.exists());
+        Ok(())
+    }
+
+    #[test]
+    fn config_from_cli() -> Result<()> {
+        let secret = None;
+        let file = None;
+        let message = Some(vec!["from cli".to_string()]);
+        let mode = Mode::Send;
+        let peer_id = PeerId::random();
+        let name = None;
+        let debug = 0;
+        let port = Some(5555);
+        let config = None;
+
+        let opts = Cli {
+            secret,
+            message,
+            file,
+            mode,
+            remote_peer_id: Some(peer_id),
+            debug,
+            port,
+            config,
+            name,
+        };
+        let db_path = assert_fs::NamedTempFile::new("scs.db3")?;
+        let store = Store::initialize(Some(db_path.path().to_path_buf()))?;
+
+        let config = Config::new(&opts, &store)?;
+
+        assert_eq!(config.0, Mode::Send);
+        assert_eq!(config.1, Some(peer_id));
+        assert_eq!(config.2.port(), 5555);
+
+        db_path.close()?;
         Ok(())
     }
 
@@ -257,6 +294,45 @@ mod tests {
         assert_eq!(config.seed.len(), 4);
 
         file.close()?;
+        Ok(())
+    }
+
+    #[test]
+    fn fail_to_polyfill_remote_peer_id() -> Result<()> {
+        let secret = None;
+        let file = None;
+        let message = Some(vec!["from cli".to_string()]);
+        let mode = Mode::Send;
+        // let peer_id = PeerId::random();
+        let name = None;
+        let debug = 0;
+        let port = Some(5555);
+        let config = None;
+
+        let opts = Cli {
+            secret,
+            message,
+            file,
+            mode,
+            remote_peer_id: None,
+            debug,
+            port,
+            config,
+            name,
+        };
+
+        let db_path = assert_fs::NamedTempFile::new("scs.db3")?;
+        let store = Store::initialize(Some(db_path.path().to_path_buf()))?;
+
+        let rpm = Config::remote_peer_id_polyfill(&opts, &store);
+        assert!(rpm.is_err());
+        let _ = rpm.map_err(|err| {
+            assert!(err
+                .to_string()
+                .contains("Either a remote peer id or a name must be present"))
+        });
+
+        db_path.close()?;
         Ok(())
     }
 

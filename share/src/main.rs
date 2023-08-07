@@ -82,7 +82,7 @@ async fn main() {
     let opts = Cli::parse();
     logger::log(&opts).unwrap();
 
-    let store = match Store::initialize() {
+    let store = match Store::initialize(None) {
         Ok(store) => store,
         Err(err) => {
             error!("{:#?}", err.to_string());
@@ -108,4 +108,41 @@ async fn main() {
         }
     };
     ::std::process::exit(code);
+}
+
+#[cfg(test)]
+mod tests {
+    use libp2p::PeerId;
+
+    use crate::{Cli, Mode};
+
+    #[test]
+    fn cli() {
+        let secret = None;
+        let file = None;
+        let message = None;
+        let mode = Mode::Send;
+        let remote_peer_id = Some(PeerId::random());
+        let name = None;
+        let debug = 0;
+        let port = Some(5555);
+        let config = None;
+
+        let cli = Cli {
+            secret,
+            message,
+            file,
+            mode,
+            remote_peer_id,
+            debug,
+            port,
+            config,
+            name,
+        };
+
+        assert_eq!(cli.debug, 0);
+        assert_eq!(cli.file, None);
+        assert!(cli.message.is_none());
+        assert_ne!(cli.config, Some("path/to/config".to_string()))
+    }
 }
