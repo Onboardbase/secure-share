@@ -228,7 +228,7 @@ mod tests {
             config,
             name,
         };
-        let db_path = assert_fs::NamedTempFile::new("scs.db3")?;
+        let db_path = assert_fs::NamedTempFile::new("scs_config.db3")?;
         let store = Store::initialize(Some(db_path.path().to_path_buf()))?;
 
         let config = Config::new(&opts, &store)?;
@@ -321,7 +321,7 @@ mod tests {
             name,
         };
 
-        let db_path = assert_fs::NamedTempFile::new("scs.db3")?;
+        let db_path = assert_fs::NamedTempFile::new("scs_polyfill.db3")?;
         let store = Store::initialize(Some(db_path.path().to_path_buf()))?;
 
         let rpm = Config::remote_peer_id_polyfill(&opts, &store);

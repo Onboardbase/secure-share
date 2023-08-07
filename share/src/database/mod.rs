@@ -119,7 +119,7 @@ mod tests {
 
     #[test]
     fn absent_peer() -> Result<()> {
-        let db_path = assert_fs::NamedTempFile::new("scs.db3")?;
+        let db_path = assert_fs::NamedTempFile::new("scs_peer.db3")?;
         let store = Store::initialize(Some(db_path.path().to_path_buf()))?;
 
         let peer = store.is_peer_present(PeerId::random())?;
