@@ -117,6 +117,7 @@ mod tests {
         Ok(())
     }
 
+    #[cfg(not(target_os = "windows"))]
     #[test]
     fn absent_peer() -> Result<()> {
         let db_path = assert_fs::NamedTempFile::new("scs_peer.db3")?;

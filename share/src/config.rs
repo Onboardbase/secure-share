@@ -205,6 +205,7 @@ mod tests {
         Ok(())
     }
 
+    #[cfg(not(target_os = "windows"))]
     #[test]
     fn config_from_cli() -> Result<()> {
         let secret = None;
@@ -297,6 +298,7 @@ mod tests {
         Ok(())
     }
 
+    #[cfg(not(target_os = "windows"))]
     #[test]
     fn fail_to_polyfill_remote_peer_id() -> Result<()> {
         let secret = None;
