@@ -2617,6 +2617,7 @@ dependencies = [
  "assert_fs",
  "cargo-husky",
  "clap",
+ "dialoguer",
  "directories-next",
  "futures",
  "futures-timer",

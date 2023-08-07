@@ -69,11 +69,11 @@ impl ScsPeer {
         Ok(())
     }
 
-    pub fn get_peer(name: String, store: &Store) -> Result<ScsPeer> {
+    pub fn get_by_name(name: String, store: &Store) -> Result<ScsPeer> {
         let conn = store.get_conn_handle();
 
-        let mut statement =
-            conn.prepare("SELECT id, name, addrs, last_seen FROM peer WHERE name = :name")?;
+        let mut statement = conn
+            .prepare("SELECT id, name, addrs, peer_id, last_seen FROM peer WHERE name = :name")?;
         let peer_iter = statement.query_map(named_params! { ":name": name }, |row| {
             Ok(ScsPeer::try_from(row).unwrap())
         })?;
@@ -82,6 +82,23 @@ impl ScsPeer {
             Err(anyhow!("Cannot find peer with name: {name}"))
         } else {
             Ok(peers.first().unwrap().clone())
+        }
+    }
+
+    pub fn get_by_peer_id(peer_id: String, store: &Store) -> Result<Option<ScsPeer>> {
+        let conn = store.get_conn_handle();
+
+        let mut statement = conn.prepare(
+            "SELECT id, name, addrs, peer_id, last_seen FROM peer WHERE peer_id = :peer_id",
+        )?;
+        let peer_iter = statement.query_map(named_params! { ":peer_id": peer_id }, |row| {
+            Ok(ScsPeer::try_from(row).unwrap())
+        })?;
+        let peers = peer_iter.filter_map(|peer| peer.ok()).collect::<Vec<_>>();
+        if peers.is_empty() {
+            Ok(None)
+        } else {
+            Ok(Some(peers.first().unwrap().clone()))
         }
     }
 }
