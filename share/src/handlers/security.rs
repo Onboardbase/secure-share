@@ -127,6 +127,7 @@ mod tests {
             - {addr}
             whitelists:
             - {addr}
+            seed: config
         "
         );
         let config: Config = serde_yaml::from_str(&yaml_config)?;
