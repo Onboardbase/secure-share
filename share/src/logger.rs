@@ -1,6 +1,6 @@
 use std::fs::{self};
 
-use crate::config::Config;
+use crate::Cli;
 use anyhow::{Context, Result};
 use tracing::Level;
 use tracing_subscriber::{
@@ -8,10 +8,10 @@ use tracing_subscriber::{
     fmt::{format, writer::MakeWriterExt},
 };
 
-pub fn log(config: &Config) -> Result<()> {
-    let (level, source_location) = match config.verbose() {
-        false => (Level::INFO, false),
-        true => (Level::DEBUG, true),
+pub fn log(config: &Cli) -> Result<()> {
+    let (level, source_location) = match config.debug {
+        0 => (Level::INFO, false),
+        _ => (Level::DEBUG, true),
     };
 
     let dirs = directories_next::ProjectDirs::from("com", "onboardbase", "secureshare").unwrap();

@@ -41,6 +41,10 @@ pub struct Cli {
     #[clap(long, short)]
     remote_peer_id: Option<PeerId>,
 
+    // Name of the saved recipient to send a secret to.
+    #[clap(long, short)]
+    name: Option<String>,
+
     ///Port to establish connection on
     #[clap(long, short)]
     port: Option<i32>,
@@ -74,19 +78,20 @@ impl FromStr for Mode {
 #[tokio::main]
 async fn main() {
     let opts = Cli::parse();
-    let (mode, remote_peer_id, config) = match Config::new(&opts) {
-        Ok(res) => res,
-        Err(err) => {
-            eprintln!("{}", err);
-            exit(1)
-        }
-    };
+    logger::log(&opts).unwrap();
 
-    logger::log(&config).unwrap();
     let store = match Store::initialize() {
         Ok(store) => store,
         Err(err) => {
             error!("{:#?}", err.to_string());
+            exit(1)
+        }
+    };
+
+    let (mode, remote_peer_id, config) = match Config::new(&opts, &store) {
+        Ok(res) => res,
+        Err(err) => {
+            error!("{}", err);
             exit(1)
         }
     };

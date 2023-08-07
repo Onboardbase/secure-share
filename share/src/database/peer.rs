@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 
+use std::str::FromStr;
+
 use anyhow::{anyhow, Result};
 use libp2p::{Multiaddr, PeerId};
 use rusqlite::{named_params, Row};
@@ -51,6 +53,13 @@ impl From<(&Multiaddr, String, PeerId)> for ScsPeer {
 }
 
 impl ScsPeer {
+    pub fn peer_id(&self) -> Result<PeerId> {
+        match PeerId::from_str(self.peer_id.as_str()) {
+            Ok(id) => Ok(id),
+            Err(err) => Err(anyhow!("{}", err.to_string())),
+        }
+    }
+
     pub fn fetch_all_peers(store: &Store) -> Result<Vec<ScsPeer>> {
         let conn = store.get_conn_handle();
         let mut stmt = conn.prepare("SELECT id, name, addrs, last_seen FROM peer")?;

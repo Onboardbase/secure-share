@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::{
     collections::HashSet,
     fs::{self, OpenOptions},
@@ -5,12 +7,16 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Context, Result};
 use libp2p::PeerId;
 use rand::{distributions::Alphanumeric, Rng};
 use serde::{Deserialize, Serialize};
 
-use crate::{item::Secret, Cli, Mode};
+use crate::{
+    database::{peer::ScsPeer, Store},
+    item::Secret,
+    Cli, Mode,
+};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Config {
@@ -82,15 +88,33 @@ impl Config {
         Ok(config)
     }
 
-    pub fn new(opts: &Cli) -> Result<(Mode, Option<PeerId>, Config)> {
+    fn remote_peer_id_polyfill(opts: &Cli, store: &Store) -> Result<PeerId> {
+        let rpm = match &opts.remote_peer_id {
+            Some(rpm) => *rpm,
+            None => {
+                let name = match &opts.name {
+                    Some(name) => name,
+                    None => {
+                        return Err(anyhow!("Either a remote peer id or a name must be present"))
+                    }
+                };
+                let peer = ScsPeer::get_by_name(name.to_string(), store)?;
+                peer.peer_id()?
+            }
+        };
+        Ok(rpm)
+    }
+
+    pub fn new(opts: &Cli, store: &Store) -> Result<(Mode, Option<PeerId>, Config)> {
+        let rpm = Self::remote_peer_id_polyfill(opts, store)?;
         match &opts.config {
             None => {
                 let config = Config::from_cli(opts)?;
-                Ok((opts.mode, opts.remote_peer_id, config))
+                Ok((opts.mode, Some(rpm), config))
             }
             Some(path) => {
                 let config = Config::from_config_file(path.to_string())?;
-                Ok((opts.mode, opts.remote_peer_id, config))
+                Ok((opts.mode, Some(rpm), config))
             }
         }
     }
