@@ -106,15 +106,19 @@ impl Config {
     }
 
     pub fn new(opts: &Cli, store: &Store) -> Result<(Mode, Option<PeerId>, Config)> {
-        let rpm = Self::remote_peer_id_polyfill(opts, store)?;
+        let rpm = match &opts.mode {
+            Mode::Send => Some(Self::remote_peer_id_polyfill(opts, store)?),
+            Mode::Receive => None,
+        };
+
         match &opts.config {
             None => {
                 let config = Config::from_cli(opts)?;
-                Ok((opts.mode, Some(rpm), config))
+                Ok((opts.mode, rpm, config))
             }
             Some(path) => {
                 let config = Config::from_config_file(path.to_string())?;
-                Ok((opts.mode, Some(rpm), config))
+                Ok((opts.mode, rpm, config))
             }
         }
     }
