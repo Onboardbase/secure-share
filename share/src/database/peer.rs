@@ -60,9 +60,13 @@ impl ScsPeer {
         }
     }
 
+    pub fn name(&self) -> String {
+        self.name.clone()
+    }
+
     pub fn fetch_all_peers(store: &Store) -> Result<Vec<ScsPeer>> {
         let conn = store.get_conn_handle();
-        let mut stmt = conn.prepare("SELECT id, name, addrs, last_seen FROM peer")?;
+        let mut stmt = conn.prepare("SELECT id, name, addrs, peer_id, last_seen FROM peer")?;
         let peer_iter = stmt.query_map([], |row| Ok(ScsPeer::try_from(row).unwrap()))?;
         let peers = peer_iter.filter_map(|peer| peer.ok()).collect::<Vec<_>>();
         Ok(peers)

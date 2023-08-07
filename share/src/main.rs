@@ -62,6 +62,7 @@ pub struct Cli {
 pub enum Mode {
     Receive,
     Send,
+    List,
 }
 
 impl FromStr for Mode {
@@ -70,7 +71,8 @@ impl FromStr for Mode {
         match mode {
             "send" => Ok(Mode::Send),
             "receive" => Ok(Mode::Receive),
-            _ => Err("Expected either 'send' or 'receive'".to_string()),
+            "list" => Ok(Mode::List),
+            _ => Err("Expected either 'send' or 'receive' or 'list'".to_string()),
         }
     }
 }

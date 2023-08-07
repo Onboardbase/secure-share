@@ -59,7 +59,7 @@ pub fn make_request(mode: Mode, swarm: &mut Swarm<Behaviour>, peer_id: PeerId, c
                 .request_response
                 .send_request(&peer_id, items);
         }
-        Mode::Receive => {
+        Mode::Receive | Mode::List => {
             // if !is_ip_whitelisted(event, config)
         }
     }

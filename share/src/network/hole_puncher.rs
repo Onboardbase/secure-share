@@ -144,6 +144,7 @@ pub fn punch(
                 .listen_on(relay_address.with(Protocol::P2pCircuit))
                 .unwrap();
         }
+        _ => {}
     }
     let mut connection_deets = ConnectionDetails::new();
 

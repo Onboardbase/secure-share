@@ -5,6 +5,7 @@ use std::{
     fs::{self, OpenOptions},
     net::Ipv4Addr,
     path::{Path, PathBuf},
+    process::exit,
 };
 
 use anyhow::{anyhow, Context, Result};
@@ -105,10 +106,27 @@ impl Config {
         Ok(rpm)
     }
 
+    fn list_all_saved_peers(store: &Store) -> Result<Vec<ScsPeer>> {
+        ScsPeer::fetch_all_peers(store)
+    }
+
     pub fn new(opts: &Cli, store: &Store) -> Result<(Mode, Option<PeerId>, Config)> {
+        if opts.mode == Mode::List {
+            let peers = Self::list_all_saved_peers(store)?;
+            if peers.is_empty() {
+                println!("No saved peer");
+            } else {
+                for peer in peers {
+                    println!("- {}", peer.name());
+                }
+            }
+            exit(1)
+        }
+
         let rpm = match &opts.mode {
             Mode::Send => Some(Self::remote_peer_id_polyfill(opts, store)?),
             Mode::Receive => None,
+            Mode::List => exit(1),
         };
 
         match &opts.config {

@@ -63,6 +63,7 @@ impl Store {
         let peer = self.is_peer_present(peer_id)?;
 
         let res = match peer {
+            //TODO update last seen of peer
             Some(_) => Ok(()),
             None => {
                 if Confirm::with_theme(&ColorfulTheme::default())
