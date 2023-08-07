@@ -1,11 +1,13 @@
 use clap::Parser;
 use config::Config;
+use database::Store;
 use libp2p::PeerId;
 use network::punch;
 use std::{process::exit, str::FromStr};
 use tracing::error;
 
 mod config;
+mod database;
 mod handlers;
 mod item;
 mod logger;
@@ -81,9 +83,16 @@ async fn main() {
     };
 
     logger::log(&config).unwrap();
+    let store = match Store::initialize() {
+        Ok(store) => store,
+        Err(err) => {
+            error!("{:#?}", err.to_string());
+            exit(1)
+        }
+    };
 
     let code = {
-        match punch(mode, remote_peer_id, config) {
+        match punch(mode, remote_peer_id, config, store) {
             Ok(_) => 1,
             Err(err) => {
                 error!("{:#?}", err.to_string());
