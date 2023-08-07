@@ -4,6 +4,7 @@
 use std::process::exit;
 
 use super::request_response_handler;
+use crate::database::Store;
 use crate::handlers::security::{is_ip_blacklisted, is_ip_whitelisted};
 use crate::network::request::make_request;
 use crate::network::{get_behaviour, ConnectionDetails, Event};
@@ -26,7 +27,12 @@ use libp2p::{
 use tracing::{debug, error, info, instrument};
 
 #[instrument(level = "trace")]
-pub fn punch(mode: Mode, remote_peer_id: Option<PeerId>, config: Config) -> Result<()> {
+pub fn punch(
+    mode: Mode,
+    remote_peer_id: Option<PeerId>,
+    config: Config,
+    store: Store,
+) -> Result<()> {
     let relay_address: Multiaddr =
         "/ip4/157.245.40.97/tcp/4001/p2p/12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN"
             .to_string()
@@ -138,6 +144,7 @@ pub fn punch(mode: Mode, remote_peer_id: Option<PeerId>, config: Config) -> Resu
                 .listen_on(relay_address.with(Protocol::P2pCircuit))
                 .unwrap();
         }
+        _ => {}
     }
     let mut connection_deets = ConnectionDetails::new();
 
@@ -203,6 +210,12 @@ pub fn punch(mode: Mode, remote_peer_id: Option<PeerId>, config: Config) -> Resu
                     request_response::Event::Message { peer, message },
                 )) => {
                     request_response_handler(&mut swarm, message, peer, &config);
+                    match store.store_peer(&mut swarm, peer) {
+                        Ok(_) => {}
+                        Err(err) => {
+                            error!("{}", err.to_string())
+                        }
+                    }
                 }
                 _ => {}
             }

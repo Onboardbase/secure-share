@@ -1,11 +1,13 @@
 use clap::Parser;
 use config::Config;
+use database::Store;
 use libp2p::PeerId;
 use network::punch;
 use std::{process::exit, str::FromStr};
 use tracing::error;
 
 mod config;
+mod database;
 mod handlers;
 mod item;
 mod logger;
@@ -39,6 +41,10 @@ pub struct Cli {
     #[clap(long, short)]
     remote_peer_id: Option<PeerId>,
 
+    // Name of the saved recipient to send a secret to.
+    #[clap(long, short)]
+    name: Option<String>,
+
     ///Port to establish connection on
     #[clap(long, short)]
     port: Option<i32>,
@@ -56,6 +62,7 @@ pub struct Cli {
 pub enum Mode {
     Receive,
     Send,
+    List,
 }
 
 impl FromStr for Mode {
@@ -64,7 +71,8 @@ impl FromStr for Mode {
         match mode {
             "send" => Ok(Mode::Send),
             "receive" => Ok(Mode::Receive),
-            _ => Err("Expected either 'send' or 'receive'".to_string()),
+            "list" => Ok(Mode::List),
+            _ => Err("Expected either 'send' or 'receive' or 'list'".to_string()),
         }
     }
 }
@@ -72,18 +80,26 @@ impl FromStr for Mode {
 #[tokio::main]
 async fn main() {
     let opts = Cli::parse();
-    let (mode, remote_peer_id, config) = match Config::new(&opts) {
-        Ok(res) => res,
+    logger::log(&opts).unwrap();
+
+    let store = match Store::initialize(None) {
+        Ok(store) => store,
         Err(err) => {
-            eprintln!("{}", err);
+            error!("{:#?}", err.to_string());
             exit(1)
         }
     };
 
-    logger::log(&config).unwrap();
+    let (mode, remote_peer_id, config) = match Config::new(&opts, &store) {
+        Ok(res) => res,
+        Err(err) => {
+            error!("{}", err);
+            exit(1)
+        }
+    };
 
     let code = {
-        match punch(mode, remote_peer_id, config) {
+        match punch(mode, remote_peer_id, config, store) {
             Ok(_) => 1,
             Err(err) => {
                 error!("{:#?}", err.to_string());
@@ -92,4 +108,41 @@ async fn main() {
         }
     };
     ::std::process::exit(code);
+}
+
+#[cfg(test)]
+mod tests {
+    use libp2p::PeerId;
+
+    use crate::{Cli, Mode};
+
+    #[test]
+    fn cli() {
+        let secret = None;
+        let file = None;
+        let message = None;
+        let mode = Mode::Send;
+        let remote_peer_id = Some(PeerId::random());
+        let name = None;
+        let debug = 0;
+        let port = Some(5555);
+        let config = None;
+
+        let cli = Cli {
+            secret,
+            message,
+            file,
+            mode,
+            remote_peer_id,
+            debug,
+            port,
+            config,
+            name,
+        };
+
+        assert_eq!(cli.debug, 0);
+        assert_eq!(cli.file, None);
+        assert!(cli.message.is_none());
+        assert_ne!(cli.config, Some("path/to/config".to_string()))
+    }
 }

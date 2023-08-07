@@ -1,4 +1,4 @@
-port: 5555 #An optional port defaults to 0 if not present
+port: 6666 #An optional port defaults to 0 if not present
 # The folder path to store all items.
 # Secrets will be stored at <path>/secrets.json
 # Messages at <path>/messages.txt
@@ -19,4 +19,4 @@ debug: 1 #Compulsory. 0 is for off and 1 and above for on
 # blacklists:
 # - 127.0.0.1
 # - 34.138.139.178
-seed: "sour"
+seed: "bitter"
