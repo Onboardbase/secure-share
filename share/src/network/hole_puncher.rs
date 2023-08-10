@@ -15,12 +15,13 @@ use futures::{
     stream::StreamExt,
     FutureExt,
 };
+use libp2p::tls;
 use libp2p::{
     core::{muxing::StreamMuxerBox, upgrade},
     dns::DnsConfig,
     identify, identity,
     multiaddr::Protocol,
-    noise, relay,
+    relay,
     swarm::{SwarmBuilder, SwarmEvent},
     tcp, yamux, Multiaddr, PeerId, Transport,
 };
@@ -34,7 +35,7 @@ pub fn punch(
     store: Store,
 ) -> Result<()> {
     let relay_address: Multiaddr =
-        "/ip4/157.245.40.97/tcp/4001/p2p/12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN"
+        "/ip4/157.245.40.97/tcp/5555/p2p/12D3KooWACdDu7PiwBBukn58ZSjmMKucbB1KvuYPGStzihqSkJVs"
             .to_string()
             .parse()
             .unwrap();
@@ -53,7 +54,7 @@ pub fn punch(
                 tcp::Config::default().port_reuse(true),
             ))
             .upgrade(upgrade::Version::V1)
-            .authenticate(noise::Config::new(&local_key).unwrap())
+            .authenticate(tls::Config::new(&local_key).unwrap())
             .multiplex(yamux::Config::default());
 
         block_on(DnsConfig::system(relay_tcp_quic_transport))
@@ -225,6 +226,5 @@ pub fn punch(
 
 fn generate_ed25519(mut secret_key_seed: String) -> identity::Keypair {
     let bytes = unsafe { secret_key_seed.as_bytes_mut() };
-    println!("{}", bytes.len());
     identity::Keypair::ed25519_from_bytes(bytes).expect("only errors on wrong length")
 }

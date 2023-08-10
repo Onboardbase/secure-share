@@ -19,6 +19,7 @@ Share anything with teammates across machines via CLI. Share is a tool for secur
     - [Signed Certs](#signed-certificate)
     - [Seed Key](#seeds-seed-key)
 - [Recipient Info](#saving-peer-info)
+- [Storage](#items-storage-location)
 - [Update](#update)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
@@ -179,7 +180,11 @@ To see all saved peers:
 ```sh
 scs list
 ```
-
+# Items Storage Location
+Items sent (secrets, files and messages) are stored in the local folder on the machine. To find the saved items:
+- Windows: `/c/Users/<name_of_user>/AppData/Local/onboardbase/secureshare/data`
+- Linux: `/home/<name_of_user>/.local/share/secureshare`
+- Mac: 
 # Contributing
 
 Contributions of any kind are welcome! See the [contributing guide](contributing.md).
