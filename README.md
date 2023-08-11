@@ -174,14 +174,14 @@ After every session with a new peer, `scs` asks if you'll like to save the infor
 ```sh
 scs send -n dante -c config.yml
 ```
-Note: For security reasons, we don't save IP addresses of the connected peers on each machine.
+Note: For security reasons, we don't save the IP addresses of the connected peers on each machine.
 
 To see all saved peers:
 ```sh
 scs list
 ```
 # Items Storage Location
-Items sent (secrets, files and messages) are stored in the local folder on the machine. To find the saved items:
+Items sent (secrets, files, and messages) are stored in the local folder on the machine. To find the saved items:
 - Windows: `/c/Users/<name_of_user>/AppData/Local/onboardbase/secureshare/data`
 - Linux: `/home/<name_of_user>/.local/share/secureshare`
 - Mac: 
@@ -197,7 +197,6 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
 - [ ] Allow to always listen to specific addresses for an accessible data flow.
 
 ### Protocols
-- [x] Support QUIC. Use QUIC as default and fall back to TCP
 - [ ] AutoNat: If you look closely, `scs` assumes both peers are behind NATs, firewalls, or proxies. But sometimes, this might not be the case, and it is excessive to hole punch just for that. Implementing `AutoNat` will first check if the two peers can communicate directly. If not, it will then proceed to hole punch. With TCP, this might take about 3 to 10 seconds, and this is where QUIC comes in and improves upon `scs`'s speed.
 
 # License
