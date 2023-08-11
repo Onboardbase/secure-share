@@ -10,6 +10,7 @@ use crate::network::request::make_request;
 use crate::network::{get_behaviour, ConnectionDetails, Event};
 use crate::{config::Config, Mode};
 use anyhow::Result;
+use futures::future::Either;
 use futures::{
     executor::{block_on, ThreadPool},
     stream::StreamExt,
@@ -48,6 +49,7 @@ pub fn punch(
 
     //intitate relay client connection
     let (relay_transport, client) = relay::client::new(local_peer_id);
+
     let transport = {
         let relay_tcp_quic_transport = relay_transport
             .or_transport(tcp::async_io::Transport::new(
@@ -55,11 +57,17 @@ pub fn punch(
             ))
             .upgrade(upgrade::Version::V1)
             .authenticate(tls::Config::new(&local_key).unwrap())
-            .multiplex(yamux::Config::default());
+            .multiplex(yamux::Config::default())
+            .or_transport(quic::async_std::Transport::new(quic::Config::new(
+                &local_key,
+            )));
 
         block_on(DnsConfig::system(relay_tcp_quic_transport))
             .unwrap()
-            .map(|either_output, _| (either_output.0, StreamMuxerBox::new(either_output.1)))
+            .map(|either_output, _| match either_output {
+                Either::Left((peer_id, muxer)) => (peer_id, StreamMuxerBox::new(muxer)),
+                Either::Right((peer_id, muxer)) => (peer_id, StreamMuxerBox::new(muxer)),
+            })
             .boxed()
     };
 
@@ -70,6 +78,9 @@ pub fn punch(
     }
     .build();
 
+    swarm
+        .listen_on(format!("/ip4/0.0.0.0/udp/{port}/quic-v1").parse().unwrap())
+        .unwrap();
     swarm
         .listen_on(format!("/ip4/0.0.0.0/tcp/{port}").parse().unwrap())
         .unwrap();
