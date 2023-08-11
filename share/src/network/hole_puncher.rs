@@ -10,17 +10,19 @@ use crate::network::request::make_request;
 use crate::network::{get_behaviour, ConnectionDetails, Event};
 use crate::{config::Config, Mode};
 use anyhow::Result;
+use futures::future::Either;
 use futures::{
     executor::{block_on, ThreadPool},
     stream::StreamExt,
     FutureExt,
 };
+use libp2p::tls;
 use libp2p::{
     core::{muxing::StreamMuxerBox, upgrade},
     dns::DnsConfig,
     identify, identity,
     multiaddr::Protocol,
-    noise, relay,
+    relay,
     swarm::{SwarmBuilder, SwarmEvent},
     tcp, yamux, Multiaddr, PeerId, Transport,
 };
@@ -34,7 +36,7 @@ pub fn punch(
     store: Store,
 ) -> Result<()> {
     let relay_address: Multiaddr =
-        "/ip4/157.245.40.97/tcp/4001/p2p/12D3KooWDpJ7As7BWAwRMfu1VU2WCqNjvq387JEYKDBj4kx6nXTN"
+        "/ip4/157.245.40.97/tcp/3456/p2p/12D3KooWJodhq2Ctxot893Uv3TzzaCoYW7jQrk5Tyfc1vKYFE4Ag"
             .to_string()
             .parse()
             .unwrap();
@@ -47,18 +49,25 @@ pub fn punch(
 
     //intitate relay client connection
     let (relay_transport, client) = relay::client::new(local_peer_id);
+
     let transport = {
         let relay_tcp_quic_transport = relay_transport
             .or_transport(tcp::async_io::Transport::new(
                 tcp::Config::default().port_reuse(true),
             ))
             .upgrade(upgrade::Version::V1)
-            .authenticate(noise::Config::new(&local_key).unwrap())
-            .multiplex(yamux::Config::default());
+            .authenticate(tls::Config::new(&local_key).unwrap())
+            .multiplex(yamux::Config::default())
+            .or_transport(quic::async_std::Transport::new(quic::Config::new(
+                &local_key,
+            )));
 
         block_on(DnsConfig::system(relay_tcp_quic_transport))
             .unwrap()
-            .map(|either_output, _| (either_output.0, StreamMuxerBox::new(either_output.1)))
+            .map(|either_output, _| match either_output {
+                Either::Left((peer_id, muxer)) => (peer_id, StreamMuxerBox::new(muxer)),
+                Either::Right((peer_id, muxer)) => (peer_id, StreamMuxerBox::new(muxer)),
+            })
             .boxed()
     };
 
@@ -69,6 +78,9 @@ pub fn punch(
     }
     .build();
 
+    swarm
+        .listen_on(format!("/ip4/0.0.0.0/udp/{port}/quic-v1").parse().unwrap())
+        .unwrap();
     swarm
         .listen_on(format!("/ip4/0.0.0.0/tcp/{port}").parse().unwrap())
         .unwrap();
@@ -225,6 +237,5 @@ pub fn punch(
 
 fn generate_ed25519(mut secret_key_seed: String) -> identity::Keypair {
     let bytes = unsafe { secret_key_seed.as_bytes_mut() };
-    println!("{}", bytes.len());
     identity::Keypair::ed25519_from_bytes(bytes).expect("only errors on wrong length")
 }

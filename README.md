@@ -19,6 +19,7 @@ Share anything with teammates across machines via CLI. Share is a tool for secur
     - [Signed Certs](#signed-certificate)
     - [Seed Key](#seeds-seed-key)
 - [Recipient Info](#saving-peer-info)
+- [Storage](#items-storage-location)
 - [Update](#update)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
@@ -179,7 +180,11 @@ To see all saved peers:
 ```sh
 scs list
 ```
-
+# Items Storage Location
+Items sent (secrets, files and messages) are stored in the local folder on the machine. To find the saved items:
+- Windows: `/c/Users/<name_of_user>/AppData/Local/onboardbase/secureshare/data`
+- Linux: `/home/<name_of_user>/.local/share/secureshare`
+- Mac: 
 # Contributing
 
 Contributions of any kind are welcome! See the [contributing guide](contributing.md).
@@ -192,7 +197,7 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
 - [ ] Allow to always listen to specific addresses for an accessible data flow.
 
 ### Protocols
-- [ ] Support QUIC. Use QUIC as default and fall back to TCP
+- [x] Support QUIC. Use QUIC as default and fall back to TCP
 - [ ] AutoNat: If you look closely, `scs` assumes both peers are behind NATs, firewalls, or proxies. But sometimes, this might not be the case, and it is excessive to hole punch just for that. Implementing `AutoNat` will first check if the two peers can communicate directly. If not, it will then proceed to hole punch. With TCP, this might take about 3 to 10 seconds, and this is where QUIC comes in and improves upon `scs`'s speed.
 
 # License
