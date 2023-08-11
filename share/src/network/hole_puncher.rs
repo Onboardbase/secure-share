@@ -36,7 +36,7 @@ pub fn punch(
     store: Store,
 ) -> Result<()> {
     let relay_address: Multiaddr =
-        "/ip4/157.245.40.97/tcp/5555/p2p/12D3KooWACdDu7PiwBBukn58ZSjmMKucbB1KvuYPGStzihqSkJVs"
+        "/ip4/157.245.40.97/tcp/3456/p2p/12D3KooWJodhq2Ctxot893Uv3TzzaCoYW7jQrk5Tyfc1vKYFE4Ag"
             .to_string()
             .parse()
             .unwrap();

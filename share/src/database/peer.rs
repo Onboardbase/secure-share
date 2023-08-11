@@ -121,6 +121,8 @@ mod tests {
     use anyhow::Result;
     use libp2p::{Multiaddr, PeerId};
 
+    use crate::database::Store;
+
     use super::ScsPeer;
 
     #[test]
@@ -145,5 +147,22 @@ mod tests {
 
         let peer_id = peer.peer_id();
         assert!(peer_id.is_err());
+    }
+
+    #[test]
+    fn create_peer() -> Result<()> {
+        let db_path = assert_fs::NamedTempFile::new("scs_peer.db3")?;
+        let store = Store::initialize(Some(db_path.path().to_path_buf()))?;
+
+        let addr: Multiaddr = "/ip4/127.0.0.1/udp/38404/quic-v1".parse().unwrap();
+        let peer_id = PeerId::random();
+        let name = "kasali".to_string();
+
+        let peer = ScsPeer::from((&addr, name, peer_id));
+        peer.save(&store)?;
+
+        let found_peer = ScsPeer::get_by_peer_id(PeerId::random().to_string(), &store)?;
+        assert_eq!(found_peer, None);
+        Ok(())
     }
 }
