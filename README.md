@@ -184,7 +184,7 @@ scs list
 Items sent (secrets, files, and messages) are stored in the local folder on the machine. To find the saved items:
 - Windows: `/c/Users/<name_of_user>/AppData/Local/onboardbase/secureshare/data`
 - Linux: `/home/<name_of_user>/.local/share/secureshare`
-- Mac: 
+- Mac: `/Users/<name_of_user>/Library/Application Support/com.onboardbase.secureshare`
 # Contributing
 
 Contributions of any kind are welcome! See the [contributing guide](contributing.md).
