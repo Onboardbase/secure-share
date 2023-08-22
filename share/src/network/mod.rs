@@ -220,4 +220,14 @@ mod tests {
         let behaviour = get_behaviour((relay_client, local_key, peer_id, Mode::Send));
         assert!(!behaviour.request_response.is_connected(&peer_id));
     }
+
+    #[test]
+    fn public_nat() {
+        let local_key = generate_ed25519();
+        let peer_id = PeerId::random();
+        let (_, relay_client) = relay::client::new(peer_id);
+        let behaviour = get_behaviour((relay_client, local_key, peer_id, Mode::Send));
+        let nat_status = behaviour.auto_nat.nat_status();
+        assert!(!nat_status.is_public());
+    }
 }
