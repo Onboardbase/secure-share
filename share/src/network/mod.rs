@@ -1,5 +1,7 @@
+use std::time::Duration;
+
 use libp2p::{
-    dcutr, identify, ping, relay,
+    autonat, dcutr, identify, ping, relay,
     swarm::{ConnectionId, NetworkBehaviour},
     PeerId, StreamProtocol, Swarm,
 };
@@ -9,6 +11,7 @@ use tracing::{error, info};
 use crate::{
     config::Config,
     item::{Item, ItemResponse},
+    Mode,
 };
 pub use hole_puncher::punch;
 use request::handle_request;
@@ -24,6 +27,7 @@ pub struct Behaviour {
     identify: identify::Behaviour,
     dcutr: dcutr::Behaviour,
     request_response: json::Behaviour<Vec<Item>, ItemResponse>,
+    auto_nat: autonat::Behaviour,
 }
 
 #[derive(Debug)]
@@ -34,6 +38,7 @@ pub enum Event {
     Relay(relay::client::Event),
     Dcutr(dcutr::Event),
     RequestResonse(request_response::Event<Vec<Item>, ItemResponse>),
+    AutoNat(autonat::Event),
 }
 
 impl From<ping::Event> for Event {
@@ -63,6 +68,12 @@ impl From<dcutr::Event> for Event {
 impl From<request_response::Event<Vec<Item>, ItemResponse>> for Event {
     fn from(e: request_response::Event<Vec<Item>, ItemResponse>) -> Self {
         Event::RequestResonse(e)
+    }
+}
+
+impl From<autonat::Event> for Event {
+    fn from(v: autonat::Event) -> Self {
+        Self::AutoNat(v)
     }
 }
 
@@ -100,10 +111,32 @@ impl ConnectionDetails {
 }
 
 pub fn get_behaviour(
-    client: libp2p::relay::client::Behaviour,
-    local_key: libp2p::identity::Keypair,
-    local_peer_id: PeerId,
+    payload: (
+        libp2p::relay::client::Behaviour,
+        libp2p::identity::Keypair,
+        PeerId,
+        Mode,
+    ),
 ) -> Behaviour {
+    let (client, local_key, local_peer_id, mode) = payload;
+    let autonat_config = match mode {
+        Mode::Receive => autonat::Config {
+            only_global_ips: false,
+            ..Default::default()
+        },
+        Mode::Send => autonat::Config {
+            retry_interval: Duration::from_secs(10),
+            refresh_interval: Duration::from_secs(30),
+            boot_delay: Duration::from_secs(5),
+            throttle_server_period: Duration::ZERO,
+            only_global_ips: false,
+            ..Default::default()
+        },
+        Mode::List => autonat::Config {
+            ..Default::default()
+        },
+    };
+
     Behaviour {
         relay_client: client,
         ping: ping::Behaviour::new(ping::Config::new()),
@@ -119,6 +152,7 @@ pub fn get_behaviour(
             )],
             request_response::Config::default(),
         ),
+        auto_nat: autonat::Behaviour::new(local_peer_id, autonat_config),
     }
 }
 
@@ -153,6 +187,8 @@ fn request_response_handler(
 mod tests {
     use libp2p::{identity, relay, swarm::ConnectionId, PeerId};
 
+    use crate::Mode;
+
     use super::{get_behaviour, ConnectionDetails};
 
     #[test]
@@ -181,7 +217,17 @@ mod tests {
         let local_key = generate_ed25519();
         let peer_id = PeerId::random();
         let (_, relay_client) = relay::client::new(peer_id);
-        let behaviour = get_behaviour(relay_client, local_key, peer_id);
+        let behaviour = get_behaviour((relay_client, local_key, peer_id, Mode::Send));
         assert!(!behaviour.request_response.is_connected(&peer_id));
+    }
+
+    #[test]
+    fn public_nat() {
+        let local_key = generate_ed25519();
+        let peer_id = PeerId::random();
+        let (_, relay_client) = relay::client::new(peer_id);
+        let behaviour = get_behaviour((relay_client, local_key, peer_id, Mode::Send));
+        let nat_status = behaviour.auto_nat.nat_status();
+        assert!(!nat_status.is_public());
     }
 }

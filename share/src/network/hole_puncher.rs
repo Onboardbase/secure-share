@@ -36,7 +36,7 @@ pub fn punch(
     store: Store,
 ) -> Result<()> {
     let relay_address: Multiaddr =
-        "/ip4/157.245.40.97/tcp/3456/p2p/12D3KooWJodhq2Ctxot893Uv3TzzaCoYW7jQrk5Tyfc1vKYFE4Ag"
+        "/ip4/157.245.40.97/tcp/4001/p2p/12D3KooWMAXwrRcBdK3hFECY7b69PVW5rfHRa2WQPmbmMezZnEVG"
             .to_string()
             .parse()
             .unwrap();
@@ -71,7 +71,7 @@ pub fn punch(
             .boxed()
     };
 
-    let behaviour = get_behaviour(client, local_key, local_peer_id);
+    let behaviour = get_behaviour((client, local_key, local_peer_id, mode));
     let mut swarm = match ThreadPool::new() {
         Ok(tp) => SwarmBuilder::with_executor(transport, behaviour, local_peer_id, tp),
         Err(_) => SwarmBuilder::without_executor(transport, behaviour, local_peer_id),
@@ -84,6 +84,14 @@ pub fn punch(
     swarm
         .listen_on(format!("/ip4/0.0.0.0/tcp/{port}").parse().unwrap())
         .unwrap();
+
+    // match mode {
+    //     Mode::Send => swarm
+    //         .behaviour_mut()
+    //         .auto_nat
+    //         .add_server(remote_peer_id.unwrap(), None),
+    //     _ => {}
+    // }
 
     // Wait to listen on all interfaces.
     block_on(async {
