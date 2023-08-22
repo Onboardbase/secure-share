@@ -1,6 +1,6 @@
 <div align="center">
 
-# Secure share [![codecov](https://codecov.io/gh/Onboardbase/secure-share/branch/main/graph/badge.svg?token=H4CB88WT9I)](https://codecov.io/gh/Onboardbase/secure-share) [![Release](https://github.com/Onboardbase/secure-share/actions/workflows/release.yml/badge.svg)](https://github.com/Onboardbase/secure-share/actions/workflows/release.yml)[![Lint](https://github.com/Onboardbase/secure-share/actions/workflows/lint.yml/badge.svg)](https://github.com/Onboardbase/secure-share/actions/workflows/lint.yml)
+# Secure share [![codecov](https://codecov.io/gh/Onboardbase/secure-share/branch/main/graph/badge.svg?token=H4CB88WT9I)](https://codecov.io/gh/Onboardbase/secure-share) [![Lint](https://github.com/Onboardbase/secure-share/actions/workflows/lint.yml/badge.svg)](https://github.com/Onboardbase/secure-share/actions/workflows/lint.yml)
 
 Share anything with teammates across machines via CLI. Share is a tool for secure peer-to-peer connections, enabling direct communication and efficient exchange of secrets, files, and messages between machines with or without direct access to the internet. 
 
@@ -164,27 +164,27 @@ seed: "scsiscool"
  Add a `connection: trusted` or `connection: self` to the configuration file.
 
  ### Seeds (Seed Key)
- The backbone of `scs` is `PeerId`. A `PeerId` a randomly generated key whenever a session is started for both the receiver and the sender. As of `v0.1.3` of `scs`, `PeerId`s can now be deterministic, that is, a single `PeerId` can be used for life. To do this, you need to set what is called a "seed". The `PeerId` is generated with respect to this seed. As long as the seed key remains the same, the `PeerId` will remain the same. 
+ The backbone of `scs` is `PeerId`. A `PeerId` is a randomly generated key whenever a session is started for both the receiver and the sender. As of `v0.1.3` of `scs`, `PeerId`s can now be deterministic; a single `PeerId` can be used for life. To do this, you need to set a "seed". The `PeerId` is generated concerning this seed. As long as the seed key remains the same, the `PeerId` will remain. 
  The "seed" key is a string of any length lesser than 32. But for ease and optimal configuration, we recommend 4 or 5 letter words as in the above configuration file.
 
 
 # Saving Peer Info
-To make using `scs` easier after the initial setup, `scs` implements a simple mechanism for storing recipients information. 
+To make using `scs` easier after the initial setup, `scs` implements a simple mechanism for storing recipients' information. 
 After every session with a new peer, `scs` asks if you'll like to save the information of the connected peer. If you decide to send to that same peer, pass in the name of the peer to the `-n` argument like below
 ```sh
 scs send -n dante -c config.yml
 ```
-Note: For security reasons, we don't save IP addresses of the connected peers on each machine.
+Note: For security reasons, we don't save the IP addresses of the connected peers on each machine.
 
 To see all saved peers:
 ```sh
 scs list
 ```
 # Items Storage Location
-Items sent (secrets, files and messages) are stored in the local folder on the machine. To find the saved items:
+Items sent (secrets, files, and messages) are stored in the local folder on the machine. To find the saved items:
 - Windows: `/c/Users/<name_of_user>/AppData/Local/onboardbase/secureshare/data`
 - Linux: `/home/<name_of_user>/.local/share/secureshare`
-- Mac: 
+- Mac: `/Users/<name_of_user>/Library/Application Support/com.onboardbase.secureshare`
 # Contributing
 
 Contributions of any kind are welcome! See the [contributing guide](contributing.md).
@@ -193,13 +193,7 @@ Contributions of any kind are welcome! See the [contributing guide](contributing
 
 # Roadmap
 
-### Utilities
-- [x] Personalize peer ID.
-- [x] Allow saving recipient info (address, port, etc.) and giving a proper name so one can do "scs send dante -m Hello"
-- [ ] Allow to always listen to specific addresses for an accessible data flow.
-
 ### Protocols
-- [x] Support QUIC. Use QUIC as default and fall back to TCP
 - [ ] AutoNat: If you look closely, `scs` assumes both peers are behind NATs, firewalls, or proxies. But sometimes, this might not be the case, and it is excessive to hole punch just for that. Implementing `AutoNat` will first check if the two peers can communicate directly. If not, it will then proceed to hole punch. With TCP, this might take about 3 to 10 seconds, and this is where QUIC comes in and improves upon `scs`'s speed.
 
 # License
