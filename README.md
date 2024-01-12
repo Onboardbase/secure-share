@@ -22,8 +22,6 @@ Share anything with teammates across machines via CLI. Share is a tool for secur
 - [Storage](#items-storage-location)
 - [Update](#update)
 - [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [License](#license)
 - [Technical Details](#techincals)
 
 ## Dependencies
@@ -185,15 +183,6 @@ Items sent (secrets, files, and messages) are stored in the local folder on the 
 - Windows: `/c/Users/<name_of_user>/AppData/Local/onboardbase/secureshare/data`
 - Linux: `/home/<name_of_user>/.local/share/secureshare`
 - Mac: `/Users/<name_of_user>/Library/Application Support/com.onboardbase.secureshare`
-# Contributing
-
-Contributions of any kind are welcome! See the [contributing guide](contributing.md).
-
-[Thanks goes to these contributors](https://github.com/Onboardbase/secure-share/graphs/contributors)!
-
-# License
-
-See [LICENSE](LICENSE) © [Onboardbase](https://github.com/Onboardbase/)
 
 # Technicals
 
